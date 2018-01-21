@@ -33,5 +33,6 @@ public interface Parameters {
 	public String EXPECTED_REQUESTED_WITH = "XMLHttpRequest";
 	public String EXPECTED_CONTENT_TYPE = "application/json";
 	public String MESSAGE_NEW_COMMENT = "comment.new";
+	public String ID_COMMENT = "commentId";
 	
 }

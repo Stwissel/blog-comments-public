@@ -61,7 +61,16 @@
 			<artifactId>vertx-web</artifactId>
 			<version>3.5.0</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-web-client</artifactId>
+			<version>3.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-auth-oauth2</artifactId>
+			<version>3.5.0</version>
+		</dependency>
 		<dependency>
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>

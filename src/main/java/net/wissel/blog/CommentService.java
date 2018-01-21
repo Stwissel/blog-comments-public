@@ -61,31 +61,44 @@ public class CommentService extends AbstractVerticle {
 	@Override
 	public void start(final Future<Void> startFuture) throws Exception {
 
-		final String portCandidate = System.getenv("PORT");
-		final int port = ((portCandidate == null) || "".equals(portCandidate)) ? 5000 : Integer.valueOf(portCandidate);
+		this.getVertx().deployVerticle("net.wissel.blog.CommentStore", result -> {
+			if (result.succeeded()) {
+				final int port = Config.INSTANCE.getPort();
 
-		final HttpServer server = this.vertx.createHttpServer();
-		final Router router = Router.router(this.vertx);
-		router.route().handler(BodyHandler.create());
+				final HttpServer server = this.vertx.createHttpServer();
+				final Router router = Router.router(this.vertx);
+				router.route().handler(BodyHandler.create());
+				
+				final Route allowCORS = router.route(CommentService.COMMENT_PATH);
+				allowCORS.handler(CorsHandler.create("wissel\\.net").allowedMethod(HttpMethod.POST));
+				allowCORS.handler(CorsHandler.create("www\\.wissel\\.net").allowedMethod(HttpMethod.POST));
+				allowCORS.handler(CorsHandler.create("stwissel\\.github\\.io").allowedMethod(HttpMethod.POST));
+				allowCORS.handler(ctx -> {
+					if (ctx.request().method() != HttpMethod.POST) {
+						ctx.response().end("Info");
+					} else {
+						ctx.next();
+					}
+				});
+				final Route incomingCommentRoute = router.route(HttpMethod.POST, CommentService.COMMENT_PATH)
+						.consumes("application/json").produces("application/json");
+				incomingCommentRoute.handler(this::newComment);
+				incomingCommentRoute.failureHandler(this::commentFailure);
 
-		final Route incomingCommentRoute = router.route(HttpMethod.POST, CommentService.COMMENT_PATH)
-				.consumes("application/json").produces("application/json");
-		incomingCommentRoute.handler(CorsHandler.create("wissel\\.net").allowedMethod(HttpMethod.POST));
-		incomingCommentRoute.handler(CorsHandler.create("www\\.wissel\\.net").allowedMethod(HttpMethod.POST));
-		incomingCommentRoute.handler(CorsHandler.create("stwissel\\.github\\.io").allowedMethod(HttpMethod.POST));
-		incomingCommentRoute.handler(this::newComment);
-		incomingCommentRoute.failureHandler(this::commentFailure);
+				router.route("/*").handler(StaticHandler.create());
 
-		router.route("/*").handler(StaticHandler.create());
-
-		server.requestHandler(router::accept).listen(port, listenResult -> {
-			if (listenResult.failed()) {
-				System.out.println("Could not start HTTP server on port " + String.valueOf(port));
-				listenResult.cause().printStackTrace();
-				startFuture.fail(listenResult.cause());
+				server.requestHandler(router::accept).listen(port, listenResult -> {
+					if (listenResult.failed()) {
+						System.out.println("Could not start HTTP server on port " + String.valueOf(port));
+						listenResult.cause().printStackTrace();
+						startFuture.fail(listenResult.cause());
+					} else {
+						System.out.println("Server started on port " + String.valueOf(port));
+						startFuture.complete();
+					}
+				});
 			} else {
-				System.out.println("Server started on port " + String.valueOf(port));
-				startFuture.complete();
+				startFuture.fail(result.cause());
 			}
 		});
 	}
@@ -107,7 +120,7 @@ public class CommentService extends AbstractVerticle {
 	 *            Routing context
 	 */
 	private void commentFailure(final RoutingContext ctx) {
-		ResultMessage.end(ctx.response(),"Something went wrong", 500);
+		ResultMessage.end(ctx.response(), "Something went wrong", 500);
 	}
 
 	/**
@@ -125,8 +138,7 @@ public class CommentService extends AbstractVerticle {
 		try {
 			// We check if we have everything
 			final BlogComment blogComment = comment.mapTo(BlogComment.class);
-			// TODO: Retrieve Captcha Key
-			blogComment.checkForMandatoryFields(null);
+			blogComment.checkForMandatoryFields(Config.INSTANCE.getCaptchSecret());
 			final EventBus eb = this.getVertx().eventBus();
 			eb.publish(Parameters.MESSAGE_NEW_COMMENT, comment);
 			ResultMessage.end(response, Parameters.SUCCESS_MESSAGE, 200);

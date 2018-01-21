@@ -30,19 +30,19 @@ import io.vertx.core.json.JsonObject;
  *
  */
 public class ResultMessage {
-	public final String status;
-	public final int error;
+	public final String message;
+	public final int status;
 	
 	public ResultMessage(final String message, final int errorNum) {
-		this.status = message;
-		this.error = errorNum;
+		this.message = message;
+		this.status = errorNum;
 	}
 	
 	@SuppressWarnings("unused")
 	private ResultMessage() {
 		// Don't construct one
-		this.status = "Unknown";
-		this.error = 500;
+		this.message = "Unknown";
+		this.status = 500;
 	}
 
 	/**

@@ -65,6 +65,11 @@ public class BlogComment {
 			problems.add("Please provide a valid URL or none");
 			canProceed = false;
 		}
+		
+		if (this.parentId == null || this.parentId.trim().equals("")) {
+			problems.add("I can't identify which post you try to comment, Sorry");
+			canProceed = false;
+		}
 
 		if (!HTMLFilter.isValidCaptcha(captchaKey, this.rChallenge, this.rResponse)) {
 			problems.add("Sorry, the ReCaptchaCode wasn't valid, you might want to try again");
