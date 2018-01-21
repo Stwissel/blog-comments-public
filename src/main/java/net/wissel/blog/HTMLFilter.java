@@ -165,7 +165,7 @@ public final class HTMLFilter {
 	 * @param response
 	 * @return
 	 */
-	public static boolean isValidCaptcha(String captchaKey, String challenge, String response) {
+	public static boolean isValidCaptcha(String captchaKey, String response) {
 		boolean result = true;
 		// We only test if we have a remote address and the captcha switch is on
 		if (captchaKey != null) {

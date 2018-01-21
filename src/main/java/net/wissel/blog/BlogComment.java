@@ -26,13 +26,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties
 public class BlogComment {
 	public String Commentor;
 	public String eMail;
 	public String webSite;
 	public String Body;
-	public String rChallenge;
-	public String rResponse;
+	public String captcha;
 	public String parentId;
 	public final Map<String, String> parameters = new HashMap<>();
 
@@ -71,7 +73,7 @@ public class BlogComment {
 			canProceed = false;
 		}
 
-		if (!HTMLFilter.isValidCaptcha(captchaKey, this.rChallenge, this.rResponse)) {
+		if (!HTMLFilter.isValidCaptcha(captchaKey, this.captcha)) {
 			problems.add("Sorry, the ReCaptchaCode wasn't valid, you might want to try again");
 			canProceed = false;
 		}
