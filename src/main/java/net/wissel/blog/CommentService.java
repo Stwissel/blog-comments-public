@@ -75,17 +75,6 @@ public class CommentService extends AbstractVerticle {
 				router.route().handler(BodyHandler.create());
 
 				final Route allowCORS = router.route(HttpMethod.OPTIONS, CommentService.COMMENT_PATH);
-				/*
-				 * Cors didn't want us
-				 * allowCORS.handler(CorsHandler.create("wissel\\.net").
-				 * allowedMethod(HttpMethod.POST));
-				 * allowCORS.handler(CorsHandler.create("localhost").
-				 * allowedMethod(HttpMethod.POST));
-				 * allowCORS.handler(CorsHandler.create("www\\.wissel\\.net").
-				 * allowedMethod(HttpMethod.POST));
-				 * allowCORS.handler(CorsHandler.create("stwissel\\.github\\.io"
-				 * ).allowedMethod(HttpMethod.POST));
-				 */
 				allowCORS.handler(ctx -> {
 					this.addCors(ctx);
 					ctx.response().end();
@@ -115,9 +104,8 @@ public class CommentService extends AbstractVerticle {
 
 	private void addCors(final RoutingContext ctx) {
 		final HttpServerResponse response = ctx.response();
-		final String originCandidate = ctx.request().getHeader("Origin");
-		if (originCandidate != null) {
-			final String origin = originCandidate.replace("https://", "").replace("http://", "");
+		final String origin = ctx.request().getHeader("Origin");
+		if (origin != null) {
 			if (this.corsValues.contains(origin)) {
 				response.putHeader("Access-Control-Allow-Origin", origin);
 				response.putHeader("Access-Control-Allow-Methods", "OPTIONS, POST");
@@ -147,12 +135,12 @@ public class CommentService extends AbstractVerticle {
 	}
 
 	private void loadCors() {
-		this.corsValues.add("localhost");
-		this.corsValues.add("wissel.net");
-		this.corsValues.add("www.wissel.net");
-		this.corsValues.add("stwissel.github.io");
-		this.corsValues.add("notessensei.com");
-		this.corsValues.add("www.notessensei.com");
+		this.corsValues.add("http://localhost");
+		this.corsValues.add("https://wissel.net");
+		this.corsValues.add("https://www.wissel.net");
+		this.corsValues.add("https://stwissel.github.io");
+		this.corsValues.add("https://notessensei.com");
+		this.corsValues.add("https://www.notessensei.com");
 	}
 
 	/**
