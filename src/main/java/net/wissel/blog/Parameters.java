@@ -29,10 +29,14 @@ public interface Parameters {
 	public String HTTP_RREQUESTED_WITH = "X-Requested-With";
 	public String HTTP_USER_AGENT = "User-Agent";
 	public String HTTP_CONTENTTYPE = "Content-Type";
-	
+	public String HTTP_PUSHAPI = "/1/messages.json";
+
 	public String EXPECTED_REQUESTED_WITH = "XMLHttpRequest";
 	public String EXPECTED_CONTENT_TYPE = "application/json";
-	public String MESSAGE_NEW_COMMENT = "comment.new";
-	public String ID_COMMENT = "commentId";
 	
+	public String ID_COMMENT = "commentId";
+	public String ID_REPOSITORYPATH = "RepositoryPath";
+	
+	public String MESSAGE_NEW_COMMENT = "comment.new";
+	public String MESSAGE_PUSH_COMMENT = "comment.pushnotification";
 }

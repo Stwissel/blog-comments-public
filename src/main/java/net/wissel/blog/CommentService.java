@@ -60,7 +60,7 @@ public class CommentService extends AbstractVerticle {
 	 */
 	@Override
 	public void start(final Future<Void> startFuture) throws Exception {
-
+		this.getVertx().deployVerticle("net.wissel.blog.CommentPush");
 		this.getVertx().deployVerticle("net.wissel.blog.CommentStore", result -> {
 			if (result.succeeded()) {
 				final int port = Config.INSTANCE.getPort();

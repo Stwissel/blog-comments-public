@@ -40,6 +40,8 @@ public enum Config {
 	private static final String CAPTCHA_SECRET = "CaptchaSecret";
 	private static final String REPOSITORY_URL = "RepositoryURL";
 	private static final String OAUTH_URL= "OauthURL";
+	private static final String PUSH_USER = "PushUser";
+	private static final String PUSH_TOKEN= "PushToken";
 	
 	private boolean isInit = false;
 	private final Map<String, String> configValues = new HashMap<>();
@@ -74,6 +76,16 @@ public enum Config {
 		return this.configValues.get(OAUTH_URL);
 	}
 	
+	public String getPushToken() {
+		init();
+		return this.configValues.get(PUSH_TOKEN);
+	}
+
+	public String getPushUser() {
+		init();
+		return this.configValues.get(PUSH_USER);
+	}
+	
 	/**
 	 * Loads the configuration values from the environment
 	 * or elsewhere
@@ -90,7 +102,8 @@ public enum Config {
 		this.addParam(CAPTCHA_SECRET);
 		this.addParam(REPOSITORY_URL);
 		this.addParam(OAUTH_URL);
-		
+		this.addParam(PUSH_TOKEN);
+		this.addParam(PUSH_USER);
 		this.isInit = true;
 	}
 

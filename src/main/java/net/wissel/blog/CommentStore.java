@@ -189,7 +189,7 @@ public class CommentStore extends AbstractVerticle {
 		form.set(this.getMessagePath(message), message.encode());
 
 		final WebClient wc = this.getWebClient();
-		final String target = Config.INSTANCE.getRepositoryURL();
+		final String target = "/2.0/repositories/"+Config.INSTANCE.getRepositoryURL()+"/src";
 		wc.post(443, "api.bitbucket.org", target).ssl(true)
 				.putHeader("Content-Type", "application/x-www-form-urlencoded")
 				.putHeader("Authorization", "Bearer " + accessToken).sendForm(form, res -> {
@@ -198,6 +198,8 @@ public class CommentStore extends AbstractVerticle {
 						System.err.println("Failed to send (will retry):" + this.getMessagePath(message));
 						this.retryMessages.offer(message);
 					} else {
+						message.put(Parameters.ID_REPOSITORYPATH, this.getMessagePath(message));
+						this.getVertx().eventBus().publish(Parameters.MESSAGE_PUSH_COMMENT, message);
 						System.out.println("Posted to " + this.getMessagePath(message));
 					}
 				});
