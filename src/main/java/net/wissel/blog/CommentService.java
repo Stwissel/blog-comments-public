@@ -57,11 +57,14 @@ public class CommentService extends AbstractVerticle {
 		Runner.runVerticle(CommentService.class.getName(), true);
 	}
 
+	private final List<String> corsValues = new ArrayList<>();
+
 	/**
 	 * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Future)
 	 */
 	@Override
 	public void start(final Future<Void> startFuture) throws Exception {
+		this.loadCors();
 		this.getVertx().deployVerticle("net.wissel.blog.CommentPush");
 		this.getVertx().deployVerticle("net.wissel.blog.CommentStore", result -> {
 			if (result.succeeded()) {
@@ -84,7 +87,7 @@ public class CommentService extends AbstractVerticle {
 				 * ).allowedMethod(HttpMethod.POST));
 				 */
 				allowCORS.handler(ctx -> {
-					this.addCors(ctx.response());
+					this.addCors(ctx);
 					ctx.response().end();
 				});
 				final Route incomingCommentRoute = router.route(HttpMethod.POST, CommentService.COMMENT_PATH)
@@ -110,15 +113,17 @@ public class CommentService extends AbstractVerticle {
 		});
 	}
 
-	private void addCors(final HttpServerResponse response) {
-		final List<String> values = new ArrayList<>();
-		values.add("localhost");
-		values.add("wissel.net");
-		values.add("www.wissel.net");
-		values.add("stwissel.github.io");
-		response.putHeader("Access-Control-Allow-Origin", values);
-		response.putHeader("Access-Control-Allow-Methods", "OPTIONS, POST");
-		response.putHeader("Access-Control-Allow-Headers", "Content-Type");
+	private void addCors(final RoutingContext ctx) {
+		final HttpServerResponse response = ctx.response();
+		final String originCandidate = ctx.request().getHeader("Origin");
+		if (originCandidate != null) {
+			final String origin = originCandidate.replace("https://", "").replace("http://", "");
+			if (this.corsValues.contains(origin)) {
+				response.putHeader("Access-Control-Allow-Origin", origin);
+				response.putHeader("Access-Control-Allow-Methods", "OPTIONS, POST");
+				response.putHeader("Access-Control-Allow-Headers", "Content-Type");
+			}
+		}
 	}
 
 	private JsonObject addParametersFromHeader(final MultiMap headers, final String remoteHost) {
@@ -141,6 +146,15 @@ public class CommentService extends AbstractVerticle {
 		ResultMessage.end(ctx.response(), "Something went wrong", 500);
 	}
 
+	private void loadCors() {
+		this.corsValues.add("localhost");
+		this.corsValues.add("wissel.net");
+		this.corsValues.add("www.wissel.net");
+		this.corsValues.add("stwissel.github.io");
+		this.corsValues.add("notessensei.com");
+		this.corsValues.add("www.notessensei.com");
+	}
+
 	/**
 	 * Captures incoming new comments to be routed to forwarder
 	 *
@@ -150,7 +164,7 @@ public class CommentService extends AbstractVerticle {
 	private void newComment(final RoutingContext ctx) {
 		final HttpServerRequest request = ctx.request();
 		final HttpServerResponse response = ctx.response();
-		this.addCors(response);
+		this.addCors(ctx);
 		final MultiMap headers = request.headers();
 		final JsonObject comment = ctx.getBodyAsJson();
 		comment.put("parameters", this.addParametersFromHeader(headers, request.remoteAddress().host()));
