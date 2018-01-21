@@ -21,6 +21,9 @@
  */
 package net.wissel.blog;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
@@ -34,7 +37,6 @@ import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 
 /**
@@ -68,17 +70,22 @@ public class CommentService extends AbstractVerticle {
 				final HttpServer server = this.vertx.createHttpServer();
 				final Router router = Router.router(this.vertx);
 				router.route().handler(BodyHandler.create());
-				
-				final Route allowCORS = router.route(CommentService.COMMENT_PATH);
-				allowCORS.handler(CorsHandler.create("wissel\\.net").allowedMethod(HttpMethod.POST));
-				allowCORS.handler(CorsHandler.create("www\\.wissel\\.net").allowedMethod(HttpMethod.POST));
-				allowCORS.handler(CorsHandler.create("stwissel\\.github\\.io").allowedMethod(HttpMethod.POST));
+
+				final Route allowCORS = router.route(HttpMethod.OPTIONS, CommentService.COMMENT_PATH);
+				/*
+				 * Cors didn't want us
+				 * allowCORS.handler(CorsHandler.create("wissel\\.net").
+				 * allowedMethod(HttpMethod.POST));
+				 * allowCORS.handler(CorsHandler.create("localhost").
+				 * allowedMethod(HttpMethod.POST));
+				 * allowCORS.handler(CorsHandler.create("www\\.wissel\\.net").
+				 * allowedMethod(HttpMethod.POST));
+				 * allowCORS.handler(CorsHandler.create("stwissel\\.github\\.io"
+				 * ).allowedMethod(HttpMethod.POST));
+				 */
 				allowCORS.handler(ctx -> {
-					if (ctx.request().method() != HttpMethod.POST) {
-						ctx.response().end("Info");
-					} else {
-						ctx.next();
-					}
+					this.addCors(ctx.response());
+					ctx.response().end();
 				});
 				final Route incomingCommentRoute = router.route(HttpMethod.POST, CommentService.COMMENT_PATH)
 						.consumes("application/json").produces("application/json");
@@ -101,6 +108,17 @@ public class CommentService extends AbstractVerticle {
 				startFuture.fail(result.cause());
 			}
 		});
+	}
+
+	private void addCors(final HttpServerResponse response) {
+		final List<String> values = new ArrayList<>();
+		values.add("localhost");
+		values.add("wissel.net");
+		values.add("www.wissel.net");
+		values.add("stwissel.github.io");
+		response.putHeader("Access-Control-Allow-Origin", values);
+		response.putHeader("Access-Control-Allow-Methods", "OPTIONS, POST");
+		response.putHeader("Access-Control-Allow-Headers", "Content-Type");
 	}
 
 	private JsonObject addParametersFromHeader(final MultiMap headers, final String remoteHost) {
@@ -132,6 +150,7 @@ public class CommentService extends AbstractVerticle {
 	private void newComment(final RoutingContext ctx) {
 		final HttpServerRequest request = ctx.request();
 		final HttpServerResponse response = ctx.response();
+		this.addCors(response);
 		final MultiMap headers = request.headers();
 		final JsonObject comment = ctx.getBodyAsJson();
 		comment.put("parameters", this.addParametersFromHeader(headers, request.remoteAddress().host()));

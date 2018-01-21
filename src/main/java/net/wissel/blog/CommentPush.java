@@ -44,9 +44,11 @@ public class CommentPush extends AbstractVerticle {
 	 */
 	@Override
 	public void start(final Future<Void> startFuture) throws Exception {
-
-		final EventBus eb = this.getVertx().eventBus();
-		eb.consumer(Parameters.MESSAGE_PUSH_COMMENT, this::processNewMessages);
+		// We only bother if we have configuration values
+		if (Config.INSTANCE.getPushToken() != null && Config.INSTANCE.getPushUser() != null) {
+			final EventBus eb = this.getVertx().eventBus();
+			eb.consumer(Parameters.MESSAGE_PUSH_COMMENT, this::processNewMessages);
+		}
 		startFuture.complete();
 
 	}
@@ -68,8 +70,8 @@ public class CommentPush extends AbstractVerticle {
 		body.put("token", Config.INSTANCE.getPushToken());
 		body.put("user", Config.INSTANCE.getPushUser());
 		body.put("title", "Comment from " + message.getString("Commentor"));
-		body.put("url","https://bitbucket.org/"+Config.INSTANCE.getRepositoryURL()+"/src");
-		body.put("url_title","See in bitbucket");
+		body.put("url", "https://bitbucket.org/" + Config.INSTANCE.getRepositoryURL() + "/src");
+		body.put("url_title", "See in bitbucket");
 		final String payload = message.getString("Body");
 		body.put("message", payload.substring(0, Math.min(100, payload.length())));
 
