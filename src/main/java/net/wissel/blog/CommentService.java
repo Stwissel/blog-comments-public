@@ -157,6 +157,8 @@ public class CommentService extends AbstractVerticle {
 		final JsonObject comment = ctx.getBodyAsJson();
 		comment.put("parameters", this.addParametersFromHeader(headers, request.remoteAddress().host()));
 		try {
+			// Incoming comments are Markdown, legacy might be HTML, so we flag it here
+			comment.put("markdown", true);
 			// We check if we have everything
 			final BlogComment blogComment = comment.mapTo(BlogComment.class);
 			blogComment.checkForMandatoryFields(Config.INSTANCE.getCaptchSecret());
@@ -166,7 +168,7 @@ public class CommentService extends AbstractVerticle {
 		} catch (final Exception e) {
 			e.printStackTrace();
 			// TODO: better status code!
-			ResultMessage.end(response, e.getMessage(), 500);
+			ResultMessage.end(response, e.getMessage(), 400);
 		}
 	}
 

@@ -22,7 +22,7 @@
 package net.wissel.blog;
 
 public interface Parameters {
-	public String SUCCESS_MESSAGE = "You comment has been received and will appear shortly";
+	public String SUCCESS_MESSAGE = "You comment has been received, it will appear after review";
 	public String FAILURE_MESSAGE = "Something went wrong, we are sooo sorry";
 	public String HTTP_REFERER = "Referer";
 	public String HTTP_CLIENTIP = "ClientIP";

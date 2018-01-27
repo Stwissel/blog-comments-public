@@ -36,6 +36,7 @@ public class BlogComment {
 	public String Body;
 	public String captcha;
 	public String parentId;
+	public boolean markdown = false;
 	public final Map<String, String> parameters = new HashMap<>();
 
 	/**
