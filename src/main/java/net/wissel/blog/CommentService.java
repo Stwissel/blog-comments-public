@@ -64,6 +64,8 @@ public class CommentService extends AbstractVerticle {
 	 */
 	@Override
 	public void start(final Future<Void> startFuture) throws Exception {
+	    // Use v4 only
+	    System.setProperty("java.net.preferIPv4Stack" , "true");
 		this.loadCors();
 		this.getVertx().deployVerticle("net.wissel.blog.CommentPush");
 		this.getVertx().deployVerticle("net.wissel.blog.CommentPullRequest");

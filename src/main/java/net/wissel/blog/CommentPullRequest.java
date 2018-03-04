@@ -55,8 +55,8 @@ public class CommentPullRequest extends AbstractVerticle {
 
         final EventBus eb = this.getVertx().eventBus();
         eb.consumer(Parameters.MESSAGE_PULLREQUEST, this::processNewMessages);
-        // For messages not going through
-        this.getVertx().setPeriodic(5000L, this::retryHandler);
+        // For messages not going through - retry after 30 seconds
+        this.getVertx().setPeriodic(30000L, this::retryHandler);
         startFuture.complete();
     }
 
@@ -94,7 +94,7 @@ public class CommentPullRequest extends AbstractVerticle {
     private WebClient getWebClient() {
         if (this.client == null) {
             final WebClientOptions options = new WebClientOptions().setUserAgent("CommentService 1.0").setSsl(true)
-                    .setKeepAlive(true);
+                    .setKeepAlive(true) ;
             this.client = WebClient.create(this.vertx, options);
         }
         return this.client;

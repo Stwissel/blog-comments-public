@@ -59,8 +59,8 @@ public class CommentStore extends AbstractVerticle {
 
         final EventBus eb = this.getVertx().eventBus();
         eb.consumer(Parameters.MESSAGE_NEW_COMMENT, this::processNewMessages);
-        // For messages not going through
-        this.getVertx().setPeriodic(5000L, this::retryHandler);
+        // For messages not going through retry after 10 seconds
+        this.getVertx().setPeriodic(10000L, this::retryHandler);
 
         startFuture.complete();
 
@@ -125,7 +125,7 @@ public class CommentStore extends AbstractVerticle {
                 final int retryCount = (candidate.containsKey("retryCount")) ? (candidate.getInteger("retryCount") + 1)
                         : 1;
                 candidate.put("retryCount", retryCount);
-                if (retryCount > 10) {
+                if (retryCount > 20) {
                     this.logger.error("Retry count exceeded:" + this.getMessagePath(candidate));
                 } else {
                     // Put them back on the bus
