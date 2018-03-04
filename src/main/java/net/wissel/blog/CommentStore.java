@@ -186,6 +186,7 @@ public class CommentStore extends AbstractVerticle {
 		final MultiMap form = MultiMap.caseInsensitiveMultiMap();
 		form.set("author", this.getAuthorEmail(message));
 		form.set("message", this.getMessage(message));
+		form.set("branch", "comments");
 		form.set(this.getMessagePath(message), message.encode());
 
 		final WebClient wc = this.getWebClient();
