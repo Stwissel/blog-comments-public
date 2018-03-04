@@ -21,6 +21,9 @@
  */
 package net.wissel.blog;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.EventBus;
@@ -40,8 +43,9 @@ import io.vertx.ext.web.client.WebClientOptions;
  *
  */
 public class CommentPullRequest extends AbstractVerticle {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private WebClient    client = null;
+    private final Logger            logger        = LoggerFactory.getLogger(this.getClass());
+    private WebClient               client        = null;
+    private final Queue<JsonObject> retryMessages = new LinkedList<>();
 
     /**
      * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Future)
@@ -51,7 +55,40 @@ public class CommentPullRequest extends AbstractVerticle {
 
         final EventBus eb = this.getVertx().eventBus();
         eb.consumer(Parameters.MESSAGE_PULLREQUEST, this::processNewMessages);
+        // For messages not going through
+        this.getVertx().setPeriodic(5000L, this::retryHandler);
         startFuture.complete();
+    }
+
+    private void createPullRequest(final JsonObject message, final String accessToken) {
+
+        // Compose pull request data
+        final JsonObject source = new JsonObject();
+        source.put("branch", new JsonObject().put("name", message.getString("branch", "unknown")));
+        source.put("repository", new JsonObject().put("full_name", Config.INSTANCE.getRepositoryURL()));
+
+        final JsonObject destination = new JsonObject();
+        destination.put("branch", new JsonObject().put("name", "master"));
+
+        // Final assembly
+        final JsonObject body = new JsonObject();
+        body.put("title", "Comment from " + message.getString("Commentor", "Anonymous"));
+        body.put("source", source);
+        body.put("close_source_branch", true);
+
+        final WebClient wc = this.getWebClient();
+        final String target = "/2.0/repositories/" + Config.INSTANCE.getRepositoryURL() + "/pullrequests/";
+
+        wc.post(443, "api.bitbucket.org", target).ssl(true)
+                .putHeader("Content-Type", "application/json")
+                .putHeader("Authorization", "Bearer " + accessToken).sendJson(body, res -> {
+                    if (res.failed()) {
+                        this.logger.error(body.encode(), res.cause());
+                        this.retryMessages.offer(message);
+                    } else {
+                        this.logger.info("Pullrequest deployed");
+                    }
+                });
     }
 
     private WebClient getWebClient() {
@@ -69,9 +106,6 @@ public class CommentPullRequest extends AbstractVerticle {
         final Future<AccessToken> userToken = Future.future();
         userToken.setHandler(handler -> {
             if (handler.succeeded()) {
-                // We are good to go
-
-                // this.backendAccess = handler.result();
                 final User u = handler.result();
                 final String accessToken = u.principal().getString("access_token");
 
@@ -84,35 +118,22 @@ public class CommentPullRequest extends AbstractVerticle {
         OauthHelper.INSTANCE.getOauthSessionToken(userToken, this.getVertx());
     }
 
-    private void createPullRequest(final JsonObject message, final String accessToken) {
-
-        // Compose pull request data
-        final JsonObject source = new JsonObject();
-        source.put("branch", new JsonObject().put("name", message.getString("branch", "unknown")));
-        source.put("repository", new JsonObject().put("full_name", Config.INSTANCE.getRepositoryURL()));
-
-        final JsonObject destination = new JsonObject();
-        destination.put("branch", new JsonObject().put("name", "master"));
-
-        // Final assembly
-        final JsonObject body = new JsonObject();
-        body.put("title", "Comment from " + message.getString("Commentor", "Anonymous"));
-        body.put("description", "New web comment from " + message.getString("email", "n/a"));
-        body.put("source", source);
-        body.put("destination", destination);
-        body.put("close_source_branch", true);
-
-        final WebClient wc = this.getWebClient();
-        final String target = "/2.0/repositories/" + Config.INSTANCE.getRepositoryURL() + "/pullrequests";
-
-        wc.post(443, "api.bitbucket.org", target).ssl(true)
-                .putHeader("Content-Type", "application/application/json")
-                .putHeader("Authorization", "Bearer " + accessToken).sendJson(body, res -> {
-                    if (res.failed()) {
-                        this.logger.error(body.encodePrettily(), res.cause());
-                    } else {
-                        this.logger.info("Pullrequest deployed");
-                    }
-                });
+    private void retryHandler(final Long interval) {
+        final EventBus eb = this.getVertx().eventBus();
+        while (!this.retryMessages.isEmpty()) {
+            final JsonObject candidate = this.retryMessages.poll();
+            if (candidate != null) {
+                final int retryCount = (candidate.containsKey("retryCount")) ? (candidate.getInteger("retryCount") + 1)
+                        : 1;
+                candidate.put("retryCount", retryCount);
+                if (retryCount > 10) {
+                    this.logger.error("Retry count exceeded from user:" + candidate.getString("eMail", "n/a"));
+                } else {
+                    // Put them back on the bus
+                    this.logger.info("Retry from user: " + candidate.getString("eMail", "n/a"));
+                    eb.publish(Parameters.MESSAGE_PULLREQUEST, candidate);
+                }
+            }
+        }
     }
 }

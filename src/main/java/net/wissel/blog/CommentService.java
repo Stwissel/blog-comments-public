@@ -66,6 +66,7 @@ public class CommentService extends AbstractVerticle {
 	public void start(final Future<Void> startFuture) throws Exception {
 		this.loadCors();
 		this.getVertx().deployVerticle("net.wissel.blog.CommentPush");
+		this.getVertx().deployVerticle("net.wissel.blog.CommentPullRequest");
 		this.getVertx().deployVerticle("net.wissel.blog.CommentStore", result -> {
 			if (result.succeeded()) {
 				final int port = Config.INSTANCE.getPort();

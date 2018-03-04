@@ -26,6 +26,8 @@ import io.vertx.core.Future;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 
@@ -37,7 +39,8 @@ import io.vertx.ext.web.client.WebClientOptions;
  */
 public class CommentPush extends AbstractVerticle {
 
-	WebClient client = null;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+	private WebClient client = null;
 
 	/**
 	 * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Future)
@@ -80,9 +83,9 @@ public class CommentPush extends AbstractVerticle {
 		wc.post(443, "api.pushover.net", target).ssl(true).putHeader("Content-Type", "application/json")
 				.sendJsonObject(body, res -> {
 					if (res.failed()) {
-						System.err.println("Failed to send push notification");
+						this.logger.error("Failed to send push notification", res.cause());
 					} else {
-						System.out.println("PushOver notified");
+						this.logger.info("PushOver notified");
 					}
 				});
 

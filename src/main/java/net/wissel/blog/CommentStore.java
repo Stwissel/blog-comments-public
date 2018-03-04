@@ -59,7 +59,7 @@ public class CommentStore extends AbstractVerticle {
 
         final EventBus eb = this.getVertx().eventBus();
         eb.consumer(Parameters.MESSAGE_NEW_COMMENT, this::processNewMessages);
-        // For messages not gotung through
+        // For messages not going through
         this.getVertx().setPeriodic(5000L, this::retryHandler);
 
         startFuture.complete();
@@ -139,7 +139,7 @@ public class CommentStore extends AbstractVerticle {
     private void storeMessageInBitbucket(final JsonObject message, final String accessToken) {
 
         // Convert to HTTP Form format as used by Bitbucket API
-        final String commentBranch = "comments-" + UUID.randomUUID().toString();
+        final String commentBranch = "comments-"+UUID.randomUUID().toString().substring(0, 5);
         message.put("branch", commentBranch);
         message.put(Parameters.ID_REPOSITORYPATH, this.getMessagePath(message));
         final MultiMap form = MultiMap.caseInsensitiveMultiMap();
