@@ -39,4 +39,5 @@ public interface Parameters {
 	
 	public String MESSAGE_NEW_COMMENT = "comment.new";
 	public String MESSAGE_PUSH_COMMENT = "comment.pushnotification";
+    public String MESSAGE_PULLREQUEST = "comment.pullrequest";
 }
