@@ -139,8 +139,9 @@ public class CommentStore extends AbstractVerticle {
     private void storeMessageInBitbucket(final JsonObject message, final String accessToken) {
 
         // Convert to HTTP Form format as used by Bitbucket API
-        final String commentBranch = "comments/" + UUID.randomUUID().toString();
+        final String commentBranch = "comments-" + UUID.randomUUID().toString();
         message.put("branch", commentBranch);
+        message.put(Parameters.ID_REPOSITORYPATH, this.getMessagePath(message));
         final MultiMap form = MultiMap.caseInsensitiveMultiMap();
         form.set("author", this.getAuthorEmail(message));
         form.set("message", this.getMessage(message));
@@ -155,8 +156,7 @@ public class CommentStore extends AbstractVerticle {
                     if (res.failed()) {
                         this.logger.error("Failed to send (will retry):" + this.getMessagePath(message), res.cause());
                         this.retryMessages.offer(message);
-                    } else {
-                        message.put(Parameters.ID_REPOSITORYPATH, this.getMessagePath(message));
+                    } else {                      
                         this.getVertx().eventBus().publish(Parameters.MESSAGE_PUSH_COMMENT, message);
                         this.getVertx().eventBus().publish(Parameters.MESSAGE_PULLREQUEST, message);
                         this.logger.info("Posted to " + this.getMessagePath(message));
