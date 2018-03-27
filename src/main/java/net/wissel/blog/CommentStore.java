@@ -21,6 +21,8 @@
  */
 package net.wissel.blog;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.UUID;
@@ -75,8 +77,15 @@ public class CommentStore extends AbstractVerticle {
     }
 
     private String getMessagePath(final JsonObject message) {
-        return "/src/comments/" + message.getString("parentId") + "/" + message.getString(Parameters.ID_COMMENT)
+        
+        return "/src/comments/" + this.getDateYear() + message.getString(Parameters.ID_COMMENT)
                 + ".json";
+    }
+
+    private String getDateYear() {
+        Date today = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/");
+        return sdf.format(today);
     }
 
     private WebClient getWebClient() {
