@@ -153,7 +153,9 @@ public class CommentStore extends AbstractVerticle {
     private void storeMessageInBitbucket(final JsonObject message, final String accessToken) {
 
         // Convert to HTTP Form format as used by Bitbucket API
-        final String commentBranch = "comments-"+UUID.randomUUID().toString().substring(0, 5);
+        //final String commentBranch = "comments-"+UUID.randomUUID().toString().substring(0, 5);
+        // Single Branch, so multiple comments can be approved in one go
+        final String commentBranch = "comments";
         message.put("branch", commentBranch);
         message.put(Parameters.ID_REPOSITORYPATH, this.getMessagePath(message));
         final MultiMap form = MultiMap.caseInsensitiveMultiMap();
