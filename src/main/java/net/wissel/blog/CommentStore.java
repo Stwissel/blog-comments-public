@@ -24,6 +24,7 @@ package net.wissel.blog;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.UUID;
 
@@ -100,6 +101,10 @@ public class CommentStore extends AbstractVerticle {
     private void processNewMessages(final Message<JsonObject> incoming) {
 
         final JsonObject message = incoming.body();
+        if(!message.containsKey(Parameters.CREATED)) {
+            SimpleDateFormat sdf = new SimpleDateFormat(Parameters.IMPORT_DATE_FORMAT, Locale.US);
+            message.put(Parameters.CREATED, sdf.format(new Date()));
+        }
 
         // ADD an id if needed
         if (!message.containsKey(Parameters.ID_COMMENT)) {

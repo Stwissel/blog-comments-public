@@ -23,6 +23,7 @@ package net.wissel.blog;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ public class BlogComment {
 	public String Body;
 	public String captcha;
 	public String parentId;
+	public Date created = new Date();
 	public boolean markdown = false;
 	public final Map<String, String> parameters = new HashMap<>();
 
