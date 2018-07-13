@@ -21,58 +21,62 @@
  */
 package net.wissel.blog;
 
+import java.util.Base64;
+
 import io.vertx.core.Future;
+import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.oauth2.AccessToken;
-import io.vertx.ext.auth.oauth2.OAuth2Auth;
-import io.vertx.ext.auth.oauth2.OAuth2ClientOptions;
-import io.vertx.ext.auth.oauth2.OAuth2FlowType;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.client.WebClientOptions;
 
-public enum OauthHelper {
-    INSTANCE;
-    
-    private AccessToken backendAccess = null;
-    private OAuth2Auth oauth2 = null;
-    
-    private OAuth2Auth getOauth(Vertx vertx) {
-        if (this.oauth2 == null) {
-            final OAuth2ClientOptions credentials = new OAuth2ClientOptions()
-                    .setClientID(Config.INSTANCE.getClientToken()).setClientSecret(Config.INSTANCE.getClientSecret())
-                    .setSite(Config.INSTANCE.getOauthURL()).setAuthorizationPath("/site/oauth2/authorize")
-                    .setTokenPath("/site/oauth2/access_token");
+public class OauthHelper {
 
-            this.oauth2 = OAuth2Auth.create(vertx, OAuth2FlowType.CLIENT, credentials);
-        }
-        return this.oauth2;
-    }
-    
-    public void getOauthSessionToken(final Future<AccessToken> result, final Vertx vertx) {
+    public final static String  AUTH_PATH  = "/site/oauth2/authorize";
+    public final static String  TOKEN_PATH = "/site/oauth2/access_token";
+    public final static String  TOKEN_NAME = "access_token";
+    private final static Logger LOGGER     = LoggerFactory.getLogger("OauthHelper");
 
-        if (this.backendAccess != null) {
-            if (this.backendAccess.expired()) {
-                this.backendAccess.refresh(h -> {
-                    if (h.succeeded()) {
-                        result.complete(this.backendAccess);
+    /**
+     * Creates a manual Session to retrieve an access token
+     *
+     * @param result
+     * @param vertx
+     */
+    public static void getAccessToken(final Future<String> result, final Vertx vertx) {
+        final WebClientOptions options = new WebClientOptions().setUserAgent("CommentService 1.0.2").setSsl(true)
+                .setKeepAlive(true);
+        final WebClient wc = WebClient.create(vertx, options);
+        final String accessBasic = Base64.getEncoder().encodeToString(
+                (Config.INSTANCE.getClientToken() + ":" + Config.INSTANCE.getClientSecret()).getBytes());
+        final MultiMap form = MultiMap.caseInsensitiveMultiMap();
+        form.set("grant_type", "client_credentials");
+        form.set("scope", "");
+        form.set("client_id", Config.INSTANCE.getClientToken());
+
+        wc.post(443, Config.INSTANCE.getOauthURL(), OauthHelper.TOKEN_PATH).ssl(true)
+                .putHeader("Content-Type", "application/x-www-form-urlencoded")
+                .putHeader("Authorization", "Basic " + accessBasic).sendForm(form, res -> {
+                    if (res.failed()) {
+                        OauthHelper.LOGGER.error("Failed to obtain OAuth token:", res.cause());
+                        result.fail(res.cause());
                     } else {
-                        result.fail(h.cause());
+                        try {
+                            final JsonObject authJson = res.result().bodyAsJsonObject();
+                            if (authJson.containsKey(OauthHelper.TOKEN_NAME)) {
+                                result.complete(authJson.getString(OauthHelper.TOKEN_NAME));
+                            } else {
+                                result.fail("HTTP did not contain access token:" + authJson.encode());
+                            }
+                        } catch (final Throwable t) {
+                            OauthHelper.LOGGER.error(t);
+                            result.fail(t);
+                        }
                     }
                 });
-            } else {
-                result.complete(this.backendAccess);
-            }
-        } else {
-            final OAuth2Auth oauth = this.getOauth(vertx);
-            final JsonObject tokenConfig = new JsonObject();
-            oauth.authenticate(tokenConfig, res -> {
-                if (res.failed()) {
-                    System.err.println("Access Token Error: " + res.cause().getMessage());
-                    result.fail(res.cause());
-                } else {
-                    this.backendAccess = (AccessToken) res.result();
-                    result.complete((AccessToken) res.result());
-                }
-            });
-        }
+
     }
+
 }

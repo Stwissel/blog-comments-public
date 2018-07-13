@@ -31,8 +31,6 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.auth.User;
-import io.vertx.ext.auth.oauth2.AccessToken;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 
@@ -94,7 +92,7 @@ public class CommentPullRequest extends AbstractVerticle {
     private WebClient getWebClient() {
         if (this.client == null) {
             final WebClientOptions options = new WebClientOptions().setUserAgent("CommentService 1.0").setSsl(true)
-                    .setKeepAlive(true) ;
+                    .setKeepAlive(true);
             this.client = WebClient.create(this.vertx, options);
         }
         return this.client;
@@ -103,19 +101,17 @@ public class CommentPullRequest extends AbstractVerticle {
     private void processNewMessages(final Message<JsonObject> incoming) {
         final JsonObject message = incoming.body();
 
-        final Future<AccessToken> userToken = Future.future();
+        final Future<String> userToken = Future.future();
         userToken.setHandler(handler -> {
             if (handler.succeeded()) {
-                final User u = handler.result();
-                final String accessToken = u.principal().getString("access_token");
-
+                final String accessToken = handler.result();
                 this.createPullRequest(message, accessToken);
 
             } else {
                 this.logger.error(handler.cause().getMessage(), handler.cause());
             }
         });
-        OauthHelper.INSTANCE.getOauthSessionToken(userToken, this.getVertx());
+        OauthHelper.getAccessToken(userToken, this.getVertx());
     }
 
     private void retryHandler(final Long interval) {
@@ -127,7 +123,11 @@ public class CommentPullRequest extends AbstractVerticle {
                         : 1;
                 candidate.put("retryCount", retryCount);
                 if (retryCount > 10) {
-                    this.logger.error("Retry count exceeded from user:" + candidate.getString("eMail", "n/a"));
+                    this.logger.error(
+                            "Pull request Retry count exceeded from user:" + candidate.getString("eMail", "n/a"));
+                    this.getVertx().eventBus().publish(Parameters.MESSAGE_PUSH_COMMENT,
+                            candidate.put("Failure", "Pull request Retry count exceeded from user:"
+                                    + candidate.getString("eMail", "n/a")));
                 } else {
                     // Put them back on the bus
                     this.logger.info("Retry from user: " + candidate.getString("eMail", "n/a"));
