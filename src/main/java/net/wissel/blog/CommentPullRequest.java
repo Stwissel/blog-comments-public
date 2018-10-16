@@ -72,6 +72,7 @@ public class CommentPullRequest extends AbstractVerticle {
         final JsonObject body = new JsonObject();
         body.put("title", "Comment from " + message.getString("Commentor", "Anonymous"));
         body.put("source", source);
+        body.put("destination", destination);
         body.put("close_source_branch", true);
 
         final WebClient wc = this.getWebClient();
