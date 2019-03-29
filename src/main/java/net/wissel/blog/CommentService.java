@@ -89,7 +89,7 @@ public class CommentService extends AbstractVerticle {
 
 				router.route("/*").handler(StaticHandler.create());
 
-				server.requestHandler(router::accept).listen(port, listenResult -> {
+				server.requestHandler(router).listen(port, listenResult -> {
 					if (listenResult.failed()) {
 						System.out.println("Could not start HTTP server on port " + String.valueOf(port));
 						listenResult.cause().printStackTrace();

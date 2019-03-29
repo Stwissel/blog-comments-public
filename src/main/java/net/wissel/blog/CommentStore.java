@@ -89,7 +89,7 @@ public class CommentStore extends AbstractVerticle {
 
     private WebClient getWebClient() {
         if (this.client == null) {
-            final WebClientOptions options = new WebClientOptions().setUserAgent("CommentService 1.0.2").setSsl(true)
+            final WebClientOptions options = new WebClientOptions().setUserAgent("CommentService 1.0.4").setSsl(true)
                     .setKeepAlive(true);
             this.client = WebClient.create(this.vertx, options);
         }
@@ -154,10 +154,10 @@ public class CommentStore extends AbstractVerticle {
     private void storeMessageInBitbucket(final JsonObject message, final String accessToken) {
 
         // Convert to HTTP Form format as used by Bitbucket API
-        // final String commentBranch =
-        // "comments-"+UUID.randomUUID().toString().substring(0, 5);
+        final String commentBranch =
+        "comments-"+UUID.randomUUID().toString().substring(0, 5);
         // Single Branch, so multiple comments can be approved in one go
-        final String commentBranch = "comments";
+        // final String commentBranch = "comments";
         message.put("branch", commentBranch);
         message.put(Parameters.ID_REPOSITORYPATH, this.getMessagePath(message));
         final MultiMap form = MultiMap.caseInsensitiveMultiMap();

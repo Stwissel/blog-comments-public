@@ -3,13 +3,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.wissel.blog</groupId>
 	<artifactId>commentservice</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<name>Comment acceptance Service</name>
 	<description>Vert.x based microservice to accept new blog comments and forward them to Bitbucket</description>
 	<properties>
         <!-- Software versions -->
         <java.version>1.8</java.version>
-        <vertx.version>3.5.4</vertx.version>
+        <vertx.version>3.6.3</vertx.version>
         <commons.validator.version>1.6</commons.validator.version>
         <captcha.version>1.0.2</captcha.version>
     </properties>
