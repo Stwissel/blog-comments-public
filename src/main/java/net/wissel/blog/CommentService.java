@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
@@ -63,7 +63,7 @@ public class CommentService extends AbstractVerticle {
 	 * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Future)
 	 */
 	@Override
-	public void start(final Future<Void> startFuture) throws Exception {
+	public void start(final Promise<Void> startFuture) {
 	    // Use v4 only
 	    System.setProperty("java.net.preferIPv4Stack" , "true");
 		this.loadCors();

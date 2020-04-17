@@ -24,13 +24,16 @@ package net.wissel.blog;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 
@@ -49,7 +52,7 @@ public class CommentPullRequest extends AbstractVerticle {
      * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Future)
      */
     @Override
-    public void start(final Future<Void> startFuture) throws Exception {
+    public void start(final Promise<Void> startFuture) {
 
         final EventBus eb = this.getVertx().eventBus();
         eb.consumer(Parameters.MESSAGE_PULLREQUEST, this::processNewMessages);
@@ -102,7 +105,7 @@ public class CommentPullRequest extends AbstractVerticle {
     private void processNewMessages(final Message<JsonObject> incoming) {
         final JsonObject message = incoming.body();
 
-        final Future<String> userToken = Future.future();
+        final Future<String> userToken = OauthHelper.getAccessToken(this.getVertx());
         userToken.setHandler(handler -> {
             if (handler.succeeded()) {
                 final String accessToken = handler.result();
@@ -112,7 +115,6 @@ public class CommentPullRequest extends AbstractVerticle {
                 this.logger.error(handler.cause().getMessage(), handler.cause());
             }
         });
-        OauthHelper.getAccessToken(userToken, this.getVertx());
     }
 
     private void retryHandler(final Long interval) {

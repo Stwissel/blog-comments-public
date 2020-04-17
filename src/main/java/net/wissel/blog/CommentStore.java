@@ -28,14 +28,16 @@ import java.util.Locale;
 import java.util.Queue;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 
@@ -56,7 +58,7 @@ public class CommentStore extends AbstractVerticle {
      * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Future)
      */
     @Override
-    public void start(final Future<Void> startFuture) throws Exception {
+    public void start(final Promise<Void> startFuture) {
 
         final EventBus eb = this.getVertx().eventBus();
         eb.consumer(Parameters.MESSAGE_NEW_COMMENT, this::processNewMessages);
@@ -111,7 +113,7 @@ public class CommentStore extends AbstractVerticle {
 
         this.logger.info("Processing " + this.getMessagePath(message));
 
-        final Future<String> userToken = Future.future();
+        final Future<String> userToken = OauthHelper.getAccessToken(this.getVertx());
         userToken.setHandler(handler -> {
             if (handler.succeeded()) {
                 // We are good to go
@@ -125,7 +127,7 @@ public class CommentStore extends AbstractVerticle {
                         message.put("Failure", "Failed to get access token"));
             }
         });
-        OauthHelper.getAccessToken(userToken, this.getVertx());
+
     }
 
     private void retryHandler(final Long interval) {

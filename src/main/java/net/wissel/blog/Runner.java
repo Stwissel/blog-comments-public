@@ -26,13 +26,21 @@ import java.util.function.Consumer;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * @author stw
+ *
+ */
 public class Runner {
 
 	static Logger logger = LoggerFactory.getLogger(Runner.class);
 
+	/**
+	 * @param verticleID
+	 * @param debugMode
+	 */
 	public static void runVerticle(final String verticleID, final boolean debugMode) {
 
 		// That's just for IDE testing...
@@ -47,7 +55,7 @@ public class Runner {
 					}
 				});
 			} catch (final Throwable t) {
-				Runner.logger.error(t);
+				Runner.logger.error(t.getMessage(),t);
 			}
 		};
 
