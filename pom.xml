@@ -1,34 +1,42 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.wissel.blog</groupId>
 	<artifactId>commentservice</artifactId>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<name>Comment acceptance Service</name>
 	<description>Vert.x based microservice to accept new blog comments and forward them to Bitbucket</description>
 	<properties>
 		<!-- Software versions -->
-		<java.version>1.8</java.version>
-		<vertx.version> 4.0.0-milestone4</vertx.version>
-		<commons.validator.version>1.6</commons.validator.version>
-		<captcha.version>1.0.3</captcha.version>
-		<jackson-annotations.version>2.10.3</jackson-annotations.version>
+		<java.version>11</java.version>
+		<maven.version>[3.6.3,)</maven.version>
+		<maven.compiler.release>11</maven.compiler.release>
+		<vertx.version>4.0.2</vertx.version>
+		<commons.validator.version>1.7</commons.validator.version>
+		<captcha.version>1.0.4</captcha.version>
+		<jackson.version>2.12.2</jackson.version>
+		<graalvm.version>21.0.0.2</graalvm.version>
 	</properties>
+
+	<prerequisites>
+		<maven>${maven.version}</maven>
+	</prerequisites>
+
 	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.8.1</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<release>${java.version}</release>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.3</version>
+				<version>3.2.4</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -37,8 +45,7 @@
 						</goals>
 						<configuration>
 							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<manifestEntries>
 										<Main-Class>io.vertx.core.Starter</Main-Class>
 										<Main-Verticle>net.wissel.blog.CommentService</Main-Verticle>
@@ -51,6 +58,28 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.graalvm.nativeimage</groupId>
+				<artifactId>native-image-maven-plugin</artifactId>
+				<version>${graalvm.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>native-image</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<skip>false</skip>
+					<imageName>${project.artifactId}</imageName>
+					<buildArgs>
+						--no-fallback
+					</buildArgs>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 	<repositories>
@@ -92,11 +121,30 @@
 			<version>${captcha.version}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
-			<version>${jackson-annotations.version}</version>
+			<version>${jackson.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.graalvm.sdk</groupId>
+			<artifactId>graal-sdk</artifactId>
+			<version>${graalvm.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
 	</dependencies>
 </project>

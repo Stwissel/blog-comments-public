@@ -1,10 +1,10 @@
 /** ========================================================================= *
- * Copyright (C)  2017, 2018 Stephan Wissel                                   *
+ * Copyright (C)  2017, 2021 Stephan Wissel                                   *
  *                            All rights reserved.                            *
  *                                                                            *
- *  @author     Stephan H. Wissel (stw) <stephan@wissel@net>                  *
+ *  @author     Stephan H. Wissel (stw) <stephan@wissel.net>                  *
  *                                       @notessensei                         *
- * @version     1.0                                                           *
+ * @version     1.1                                                           *
  * ========================================================================== *
  *                                                                            *
  * Licensed under the  Apache License, Version 2.0  (the "License").  You may *
@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
@@ -49,7 +48,9 @@ import io.vertx.ext.web.client.WebClientOptions;
  */
 public class CommentStore extends AbstractVerticle {
 
-    WebClient            client = null;
+    private static final String RETRY_COUNT = "retryCount";
+
+    WebClient client = null;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final Queue<JsonObject> retryMessages = new LinkedList<>();
@@ -85,8 +86,7 @@ public class CommentStore extends AbstractVerticle {
 
     private String getMessagePath(final JsonObject message) {
 
-        return "/src/comments/" + this.getDateYear() + message.getString(Parameters.ID_COMMENT)
-                + ".json";
+        return "/src/comments/" + this.getDateYear() + message.getString(Parameters.ID_COMMENT) + ".json";
     }
 
     private WebClient getWebClient() {
@@ -111,23 +111,13 @@ public class CommentStore extends AbstractVerticle {
             message.put(Parameters.ID_COMMENT, UUID.randomUUID().toString());
         }
 
-        this.logger.info("Processing " + this.getMessagePath(message));
+        this.logger.info("Processing {}", this.getMessagePath(message));
 
-        final Future<String> userToken = OauthHelper.getAccessToken(this.getVertx());
-        userToken.setHandler(handler -> {
-            if (handler.succeeded()) {
-                // We are good to go
-                final String accessToken = handler.result();
-
-                this.storeMessageInBitbucket(message, accessToken);
-
-            } else {
-                this.logger.error("Failed to get access Token:" + this.getMessagePath(message), handler.cause());
-                this.getVertx().eventBus().publish(Parameters.MESSAGE_PUSH_COMMENT,
-                        message.put("Failure", "Failed to get access token"));
-            }
-        });
-
+        OauthHelper.getAccessToken(this.getVertx()).onFailure(err -> {
+            this.logger.error("Failed to get access Token:" + this.getMessagePath(message), err);
+            this.getVertx().eventBus().publish(Parameters.MESSAGE_PUSH_COMMENT,
+                    message.put("Failure", "Failed to get access token"));
+        }).onSuccess(accessToken -> this.storeMessageInBitbucket(message, accessToken));
     }
 
     private void retryHandler(final Long interval) {
@@ -135,17 +125,16 @@ public class CommentStore extends AbstractVerticle {
         while (!this.retryMessages.isEmpty()) {
             final JsonObject candidate = this.retryMessages.poll();
             if (candidate != null) {
-                final int retryCount = (candidate.containsKey("retryCount")) ? (candidate.getInteger("retryCount") + 1)
-                        : 1;
-                candidate.put("retryCount", retryCount);
+                final int retryCount = (candidate.getInteger(RETRY_COUNT, 0) + 1);
+                candidate.put(RETRY_COUNT, retryCount);
                 if (retryCount > 20) {
-                    this.logger.error("Retry count exceeded:" + this.getMessagePath(candidate));
+                    this.logger.error("Retry count exceeded: {}", this.getMessagePath(candidate));
                     this.getVertx().eventBus().publish(Parameters.MESSAGE_PUSH_COMMENT,
                             candidate.put("Failure", "Retry count exceeded"));
 
                 } else {
                     // Put them back on the bus
-                    this.logger.info("Retry: " + this.getMessagePath(candidate));
+                    this.logger.info("Retry: {}", this.getMessagePath(candidate));
                     eb.publish(Parameters.MESSAGE_NEW_COMMENT, candidate);
 
                 }
@@ -156,10 +145,9 @@ public class CommentStore extends AbstractVerticle {
     private void storeMessageInBitbucket(final JsonObject message, final String accessToken) {
 
         // Convert to HTTP Form format as used by Bitbucket API
-        final String commentBranch =
-        "comments-"+UUID.randomUUID().toString().substring(0, 5);
-        // Single Branch, so multiple comments can be approved in one go
-        // final String commentBranch = "comments";
+        final String commentBranch = "comments-" + UUID.randomUUID().toString().substring(0, 5);
+        // .or. Single Branch, so multiple comments can be approved in one go
+        // change commentBranch to "comments" for that
         message.put("branch", commentBranch);
         message.put(Parameters.ID_REPOSITORYPATH, this.getMessagePath(message));
         final MultiMap form = MultiMap.caseInsensitiveMultiMap();
@@ -179,7 +167,7 @@ public class CommentStore extends AbstractVerticle {
                     } else {
                         this.getVertx().eventBus().publish(Parameters.MESSAGE_PUSH_COMMENT, message);
                         this.getVertx().eventBus().publish(Parameters.MESSAGE_PULLREQUEST, message);
-                        this.logger.info("Posted to " + this.getMessagePath(message));
+                        this.logger.info("Posted to {}", this.getMessagePath(message));
                     }
                 });
     }

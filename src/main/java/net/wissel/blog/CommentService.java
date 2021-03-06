@@ -1,10 +1,10 @@
 /** ========================================================================= *
- * Copyright (C)  2017, 2018 Stephan Wissel                                   *
+ * Copyright (C)  2017, 2021 Stephan Wissel                                   *
  *                            All rights reserved.                            *
  *                                                                            *
- *  @author     Stephan H. Wissel (stw) <stephan@wissel@net>                  *
+ *  @author     Stephan H. Wissel (stw) <stephan@wissel.net>                  *
  *                                       @notessensei                         *
- * @version     1.0                                                           *
+ * @version     1.1                                                           *
  * ========================================================================== *
  *                                                                            *
  * Licensed under the  Apache License, Version 2.0  (the "License").  You may *
@@ -24,7 +24,11 @@ package net.wissel.blog;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
@@ -45,15 +49,16 @@ import io.vertx.ext.web.handler.StaticHandler;
  */
 public class CommentService extends AbstractVerticle {
 
-	private static final String COMMENT_PATH = "/blogcomments/*";
+	private static String commentPath;
+	private static final Logger LOGGER = LoggerFactory.getLogger(CommentService.class);
 
 	/**
 	 * Convenience method to allow IDE Testing
 	 *
-	 * @param args
-	 *            - Not used here
+	 * @param args - Not used here
 	 */
 	public static void main(final String[] args) {
+		CommentService.commentPath = args.length < 1 ? "/blogcomments/*" : args[0];
 		Runner.runVerticle(CommentService.class.getName(), true);
 	}
 
@@ -64,74 +69,68 @@ public class CommentService extends AbstractVerticle {
 	 */
 	@Override
 	public void start(final Promise<Void> startFuture) {
-	    // Use v4 only
-	    System.setProperty("java.net.preferIPv4Stack" , "true");
+		// Use v4 only
+		System.setProperty("java.net.preferIPv4Stack", "true");
 		this.loadCors();
-		this.getVertx().deployVerticle("net.wissel.blog.CommentPush");
-		this.getVertx().deployVerticle("net.wissel.blog.CommentPullRequest");
-		this.getVertx().deployVerticle("net.wissel.blog.CommentStore", result -> {
-			if (result.succeeded()) {
-				final int port = Config.INSTANCE.getPort();
+		this.getVertx().deployVerticle("net.wissel.blog.CommentPush")
+				.compose(v -> this.getVertx().deployVerticle("net.wissel.blog.CommentPullRequest"))
+				.compose(v -> this.getVertx().deployVerticle("net.wissel.blog.CommentStore"))
+				.compose(v -> this.launchWebListener()).onFailure(startFuture::fail).onSuccess(startFuture::complete);
+	}
 
-				final HttpServer server = this.vertx.createHttpServer();
-				final Router router = Router.router(this.vertx);
-				router.route().handler(BodyHandler.create());
+	private Future<Void> launchWebListener() {
+		return Future.future(promise -> {
+			final int port = Config.INSTANCE.getPort();
 
-				final Route allowCORS = router.route(HttpMethod.OPTIONS, CommentService.COMMENT_PATH);
-				allowCORS.handler(ctx -> {
-					this.addCors(ctx);
-					ctx.response().end();
-				});
-				final Route incomingCommentRoute = router.route(HttpMethod.POST, CommentService.COMMENT_PATH)
-						.consumes("application/json").produces("application/json");
-				incomingCommentRoute.handler(this::newComment);
-				incomingCommentRoute.failureHandler(this::commentFailure);
+			final HttpServer server = this.vertx.createHttpServer();
+			final Router router = Router.router(this.vertx);
 
-				router.route("/*").handler(StaticHandler.create());
+			router.route().handler(BodyHandler.create());
+			final Route allowCORS = router.route(HttpMethod.OPTIONS, CommentService.commentPath);
+			allowCORS.handler(ctx -> {
+				this.addCors(ctx);
+				ctx.response().end();
+			});
+			final Route incomingCommentRoute = router.route(HttpMethod.POST, CommentService.commentPath)
+					.consumes("application/json").produces("application/json");
+			incomingCommentRoute.handler(this::newComment);
+			incomingCommentRoute.failureHandler(this::commentFailure);
 
-				server.requestHandler(router).listen(port, listenResult -> {
-					if (listenResult.failed()) {
-						System.out.println("Could not start HTTP server on port " + String.valueOf(port));
-						listenResult.cause().printStackTrace();
-						startFuture.fail(listenResult.cause());
-					} else {
-						System.out.println("Server started on port " + String.valueOf(port));
-						startFuture.complete();
-					}
-				});
-			} else {
-				startFuture.fail(result.cause());
-			}
+			router.route("/*").handler(StaticHandler.create());
+
+			server.requestHandler(router).listen(port).onFailure(err -> {
+				LOGGER.error("Could not start HTTP server on port {}", port);
+				err.printStackTrace();
+				promise.fail(err);
+			}).onSuccess(v -> {
+				LOGGER.info("Server started on port {}", port);
+				promise.complete();
+			});
 		});
 	}
 
 	private void addCors(final RoutingContext ctx) {
 		final HttpServerResponse response = ctx.response();
 		final String origin = ctx.request().getHeader("Origin");
-		if (origin != null) {
-			if (this.corsValues.contains(origin)) {
-				response.putHeader("Access-Control-Allow-Origin", origin);
-				response.putHeader("Access-Control-Allow-Methods", "OPTIONS, POST");
-				response.putHeader("Access-Control-Allow-Headers", "Content-Type");
-			}
+		if (origin != null && this.corsValues.contains(origin)) {
+			response.putHeader("Access-Control-Allow-Origin", origin);
+			response.putHeader("Access-Control-Allow-Methods", "OPTIONS, POST");
+			response.putHeader("Access-Control-Allow-Headers", "Content-Type");
 		}
 	}
 
 	private JsonObject addParametersFromHeader(final MultiMap headers, final String remoteHost) {
 		final JsonObject result = new JsonObject();
 		result.put(Parameters.HTTP_CLIENTIP, remoteHost);
-		headers.entries().forEach(entry -> {
-			// We overwrite duplicate values here -> never mind for our purpose!
-			result.put(entry.getKey(), entry.getValue());
-		});
+		// We overwrite duplicate values here -> never mind for our purpose!
+		headers.entries().forEach(entry -> result.put(entry.getKey(), entry.getValue()));
 		return result;
 	}
 
 	/**
 	 * If we don't like the comment
 	 *
-	 * @param ctx
-	 *            Routing context
+	 * @param ctx Routing context
 	 */
 	private void commentFailure(final RoutingContext ctx) {
 		ResultMessage.end(ctx.response(), "Something went wrong", 500);
@@ -149,8 +148,7 @@ public class CommentService extends AbstractVerticle {
 	/**
 	 * Captures incoming new comments to be routed to forwarder
 	 *
-	 * @param ctx
-	 *            Routing context
+	 * @param ctx Routing context
 	 */
 	private void newComment(final RoutingContext ctx) {
 		final HttpServerRequest request = ctx.request();
@@ -170,7 +168,6 @@ public class CommentService extends AbstractVerticle {
 			ResultMessage.end(response, Parameters.SUCCESS_MESSAGE, 200);
 		} catch (final Exception e) {
 			e.printStackTrace();
-			// TODO: better status code!
 			ResultMessage.end(response, e.getMessage(), 400);
 		}
 	}
