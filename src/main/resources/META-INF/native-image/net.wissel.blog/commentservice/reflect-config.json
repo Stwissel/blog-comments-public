@@ -1,0 +1,1300 @@
+[
+  {
+    "name": "com.fasterxml.jackson.databind.deser.Deserializers[]"
+  },
+  {
+    "name": "com.fasterxml.jackson.databind.ext.Java7HandlersImpl",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "com.fasterxml.jackson.databind.ext.Java7SupportImpl",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "com.fasterxml.jackson.databind.ser.Serializers[]"
+  },
+  {
+    "name": "com.sun.crypto.provider.TlsMasterSecretGenerator",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "io.netty.bootstrap.ServerBootstrap$1"
+  },
+  {
+    "name": "io.netty.bootstrap.ServerBootstrap$ServerBootstrapAcceptor",
+    "methods": [
+      {
+        "name": "channelRead",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "exceptionCaught",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Throwable"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.buffer.AbstractByteBufAllocator",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "io.netty.buffer.AbstractReferenceCountedByteBuf",
+    "fields": [{ "name": "refCnt", "allowUnsafeAccess": true }]
+  },
+  {
+    "name": "io.netty.channel.ChannelDuplexHandler",
+    "methods": [
+      {
+        "name": "bind",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.net.SocketAddress",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "close",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "connect",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.net.SocketAddress",
+          "java.net.SocketAddress",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "deregister",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "disconnect",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "flush",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "read",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "write",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object",
+          "io.netty.channel.ChannelPromise"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.channel.ChannelHandlerAdapter",
+    "methods": [
+      {
+        "name": "exceptionCaught",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Throwable"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.channel.ChannelInboundHandlerAdapter",
+    "methods": [
+      {
+        "name": "channelActive",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelInactive",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelRead",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "channelReadComplete",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelRegistered",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelUnregistered",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelWritabilityChanged",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "exceptionCaught",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Throwable"
+        ]
+      },
+      {
+        "name": "userEventTriggered",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.channel.ChannelInitializer",
+    "methods": [
+      {
+        "name": "channelRegistered",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "exceptionCaught",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Throwable"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.channel.ChannelOutboundHandlerAdapter",
+    "methods": [
+      {
+        "name": "bind",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.net.SocketAddress",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "close",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "connect",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.net.SocketAddress",
+          "java.net.SocketAddress",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "deregister",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "disconnect",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "flush",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "read",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.channel.DefaultChannelPipeline$HeadContext",
+    "methods": [
+      {
+        "name": "bind",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.net.SocketAddress",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "channelActive",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelInactive",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelRead",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "channelReadComplete",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelRegistered",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelUnregistered",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelWritabilityChanged",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "close",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "connect",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.net.SocketAddress",
+          "java.net.SocketAddress",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "deregister",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "disconnect",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "exceptionCaught",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Throwable"
+        ]
+      },
+      {
+        "name": "flush",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "read",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "userEventTriggered",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "write",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object",
+          "io.netty.channel.ChannelPromise"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.channel.DefaultChannelPipeline$TailContext",
+    "methods": [
+      {
+        "name": "channelActive",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelInactive",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelRead",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "channelReadComplete",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelRegistered",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelUnregistered",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelWritabilityChanged",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "exceptionCaught",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Throwable"
+        ]
+      },
+      {
+        "name": "userEventTriggered",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.handler.codec.ByteToMessageDecoder",
+    "methods": [
+      {
+        "name": "channelInactive",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelRead",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "channelReadComplete",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "userEventTriggered",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.handler.codec.MessageToMessageDecoder",
+    "methods": [
+      {
+        "name": "channelRead",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.handler.codec.MessageToMessageEncoder",
+    "methods": [
+      {
+        "name": "write",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object",
+          "io.netty.channel.ChannelPromise"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.handler.codec.dns.DatagramDnsQueryEncoder"
+  },
+  {
+    "name": "io.netty.handler.codec.http.HttpObjectDecoder",
+    "methods": [
+      {
+        "name": "userEventTriggered",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.handler.codec.http.websocketx.extensions.WebSocketServerExtensionHandler",
+    "methods": [
+      {
+        "name": "channelRead",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "write",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object",
+          "io.netty.channel.ChannelPromise"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.handler.ssl.SslHandler",
+    "methods": [
+      {
+        "name": "bind",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.net.SocketAddress",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "channelActive",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelInactive",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelReadComplete",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "close",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "connect",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.net.SocketAddress",
+          "java.net.SocketAddress",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "deregister",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "disconnect",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "exceptionCaught",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Throwable"
+        ]
+      },
+      {
+        "name": "flush",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "read",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "write",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object",
+          "io.netty.channel.ChannelPromise"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.resolver.dns.DnsNameResolver$1"
+  },
+  {
+    "name": "io.netty.resolver.dns.DnsNameResolver$3"
+  },
+  {
+    "name": "io.netty.resolver.dns.DnsNameResolver$DnsResponseHandler",
+    "methods": [
+      {
+        "name": "channelActive",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelRead",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "exceptionCaught",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Throwable"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.util.AbstractReferenceCounted",
+    "fields": [{ "name": "refCnt", "allowUnsafeAccess": true }]
+  },
+  {
+    "name": "io.netty.util.ReferenceCountUtil",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueColdProducerFields",
+    "fields": [{ "name": "producerLimit", "allowUnsafeAccess": true }]
+  },
+  {
+    "name": "io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueConsumerFields",
+    "fields": [{ "name": "consumerIndex", "allowUnsafeAccess": true }]
+  },
+  {
+    "name": "io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueProducerFields",
+    "fields": [{ "name": "producerIndex", "allowUnsafeAccess": true }]
+  },
+  {
+    "name": "io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueConsumerIndexField",
+    "fields": [{ "name": "consumerIndex", "allowUnsafeAccess": true }]
+  },
+  {
+    "name": "io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueProducerIndexField",
+    "fields": [{ "name": "producerIndex", "allowUnsafeAccess": true }]
+  },
+  {
+    "name": "io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueProducerLimitField",
+    "fields": [{ "name": "producerLimit", "allowUnsafeAccess": true }]
+  },
+  {
+    "name": "io.vertx.core.http.impl.Http1xOrH2CHandler",
+    "methods": [
+      {
+        "name": "channelRead",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.vertx.core.http.impl.Http1xUpgradeToH2CHandler",
+    "methods": [
+      {
+        "name": "channelRead",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "userEventTriggered",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.vertx.core.http.impl.HttpServerWorker$1",
+    "methods": [
+      {
+        "name": "exceptionCaught",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Throwable"
+        ]
+      },
+      {
+        "name": "userEventTriggered",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.vertx.core.http.impl.VertxHttpRequestDecoder"
+  },
+  {
+    "name": "io.vertx.core.http.impl.VertxHttpResponseEncoder"
+  },
+  {
+    "name": "io.vertx.core.logging.SLF4JLogDelegateFactory",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "io.vertx.core.net.impl.ChannelProvider$1",
+    "methods": [
+      {
+        "name": "exceptionCaught",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Throwable"
+        ]
+      },
+      {
+        "name": "userEventTriggered",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.vertx.core.net.impl.ChannelProvider$2"
+  },
+  {
+    "name": "io.vertx.core.net.impl.ServerChannelLoadBalancer"
+  },
+  {
+    "name": "io.vertx.core.net.impl.VertxHandler",
+    "methods": [
+      {
+        "name": "channelInactive",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelRead",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "channelReadComplete",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "channelWritabilityChanged",
+        "parameterTypes": ["io.netty.channel.ChannelHandlerContext"]
+      },
+      {
+        "name": "close",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "io.netty.channel.ChannelPromise"
+        ]
+      },
+      {
+        "name": "exceptionCaught",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Throwable"
+        ]
+      },
+      {
+        "name": "userEventTriggered",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.beans.PropertyVetoException"
+  },
+  {
+    "name": "java.lang.Object",
+    "allPublicMethods": true
+  },
+  {
+    "name": "java.lang.StackTraceElement",
+    "methods": [
+      { "name": "getClassName", "parameterTypes": [] },
+      { "name": "getFileName", "parameterTypes": [] },
+      { "name": "getLineNumber", "parameterTypes": [] },
+      { "name": "getMethodName", "parameterTypes": [] }
+    ]
+  },
+  {
+    "name": "java.lang.String"
+  },
+  {
+    "name": "java.lang.Thread",
+    "methods": [{ "name": "getContextClassLoader", "parameterTypes": [] }]
+  },
+  {
+    "name": "java.lang.Throwable",
+    "methods": [{ "name": "getStackTrace", "parameterTypes": [] }]
+  },
+  {
+    "name": "java.lang.management.ManagementFactory",
+    "methods": [{ "name": "getRuntimeMXBean", "parameterTypes": [] }]
+  },
+  {
+    "name": "java.lang.management.RuntimeMXBean",
+    "methods": [
+      { "name": "getInputArguments", "parameterTypes": [] },
+      { "name": "getName", "parameterTypes": [] }
+    ]
+  },
+  {
+    "name": "java.net.SocketOption"
+  },
+  {
+    "name": "java.net.StandardSocketOptions",
+    "fields": [
+      { "name": "IP_MULTICAST_IF" },
+      { "name": "IP_MULTICAST_LOOP" },
+      { "name": "IP_MULTICAST_TTL" }
+    ]
+  },
+  {
+    "name": "java.nio.Bits",
+    "fields": [{ "name": "UNALIGNED" }]
+  },
+  {
+    "name": "java.nio.Buffer",
+    "fields": [{ "name": "address", "allowUnsafeAccess": true }]
+  },
+  {
+    "name": "java.nio.DirectByteBuffer",
+    "methods": [{ "name": "<init>", "parameterTypes": ["long", "int"] }]
+  },
+  {
+    "name": "java.nio.channels.NetworkChannel",
+    "methods": [
+      { "name": "getOption", "parameterTypes": ["java.net.SocketOption"] },
+      {
+        "name": "setOption",
+        "parameterTypes": ["java.net.SocketOption", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "java.security.AlgorithmParametersSpi"
+  },
+  {
+    "name": "java.security.KeyStoreSpi"
+  },
+  {
+    "name": "java.security.MessageDigestSpi"
+  },
+  {
+    "name": "java.security.SecureRandomParameters"
+  },
+  {
+    "name": "javax.security.auth.x500.X500Principal",
+    "fields": [{ "name": "thisX500Name" }],
+    "methods": [
+      { "name": "<init>", "parameterTypes": ["sun.security.x509.X500Name"] }
+    ]
+  },
+  {
+    "name": "jdk.internal.misc.Unsafe",
+    "methods": [{ "name": "getUnsafe", "parameterTypes": [] }]
+  },
+  {
+    "name": "net.wissel.blog.BlogComment",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "net.wissel.blog.CommentPullRequest",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "net.wissel.blog.CommentPush",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "net.wissel.blog.CommentService",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "net.wissel.blog.CommentStore",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "net.wissel.blog.ResultMessage",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.apache.log4j.Appender"
+  },
+  {
+    "name": "org.apache.log4j.AppenderSkeleton",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.apache.log4j.Category"
+  },
+  {
+    "name": "org.apache.log4j.CategoryKey"
+  },
+  {
+    "name": "org.apache.log4j.ConsoleAppender",
+    "allPublicMethods": true,
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.log4j.Layout",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.apache.log4j.Logger"
+  },
+  {
+    "name": "org.apache.log4j.PatternLayout",
+    "allPublicMethods": true,
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.log4j.Priority"
+  },
+  {
+    "name": "org.apache.log4j.WriterAppender",
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.apache.log4j.helpers.Loader"
+  },
+  {
+    "name": "org.apache.log4j.spi.OptionHandler"
+  },
+  {
+    "name": "sun.misc.Unsafe",
+    "fields": [{ "name": "theUnsafe" }],
+    "methods": [
+      {
+        "name": "copyMemory",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long",
+          "java.lang.Object",
+          "long",
+          "long"
+        ]
+      },
+      {
+        "name": "getAndAddLong",
+        "parameterTypes": ["java.lang.Object", "long", "long"]
+      },
+      {
+        "name": "getAndSetObject",
+        "parameterTypes": ["java.lang.Object", "long", "java.lang.Object"]
+      },
+      { "name": "invokeCleaner", "parameterTypes": ["java.nio.ByteBuffer"] }
+    ]
+  },
+  {
+    "name": "sun.nio.ch.SelectorImpl",
+    "fields": [
+      { "name": "publicSelectedKeys", "allowUnsafeAccess": true },
+      { "name": "selectedKeys", "allowUnsafeAccess": true }
+    ]
+  },
+  {
+    "name": "sun.security.pkcs12.PKCS12KeyStore",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "sun.security.pkcs12.PKCS12KeyStore$DualFormatPKCS12",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "sun.security.provider.JavaKeyStore$JKS",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "sun.security.provider.NativePRNG",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "sun.security.provider.SHA",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "sun.security.provider.X509Factory",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "sun.security.rsa.RSAKeyFactory$Legacy",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "sun.security.ssl.SSLContextImpl$TLSContext",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "sun.security.x509.AuthorityInfoAccessExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["java.lang.Boolean", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.AuthorityKeyIdentifierExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["java.lang.Boolean", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.BasicConstraintsExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["java.lang.Boolean", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.CRLDistributionPointsExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["java.lang.Boolean", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.CertificatePoliciesExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["java.lang.Boolean", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.ExtendedKeyUsageExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["java.lang.Boolean", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.IssuerAlternativeNameExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["java.lang.Boolean", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.KeyUsageExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["java.lang.Boolean", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.NetscapeCertTypeExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["java.lang.Boolean", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.PrivateKeyUsageExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["java.lang.Boolean", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.SubjectAlternativeNameExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["java.lang.Boolean", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.SubjectKeyIdentifierExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": ["java.lang.Boolean", "java.lang.Object"]
+      }
+    ]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.appender.AbstractAppender$Builder",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.appender.ConsoleAppender",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.appender.ConsoleAppender$Builder",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.AppenderRef",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.AppendersPlugin",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.LoggerConfig",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.LoggerConfig$RootLogger",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.LoggersPlugin",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$BigDecimalConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$BigIntegerConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$BooleanConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$ByteArrayConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$ByteConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$CharArrayConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$CharacterConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$CharsetConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$ClassConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$CronExpressionConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$DoubleConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$DurationConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$FileConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$FloatConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$InetAddressConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$IntegerConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$LevelConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$LongConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$PathConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$PatternConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$SecurityProviderConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$ShortConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$StringConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$UriConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$UrlConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.convert.TypeConverters$UuidConverter",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.validation.validators.RequiredValidator",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.visitors.PluginAttributeVisitor",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.visitors.PluginBuilderAttributeVisitor",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.visitors.PluginConfigurationVisitor",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.plugins.visitors.PluginElementVisitor",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.impl.Log4jContextFactory",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.layout.PatternLayout",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.layout.PatternLayout$Builder",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.lookup.Log4jLookup",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.core.pattern.MessagePatternConverter",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.pattern.DatePatternConverter",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.pattern.LevelPatternConverter",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.pattern.LineSeparatorPatternConverter",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.pattern.LoggerPatternConverter",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.pattern.ThreadNamePatternConverter",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.apache.logging.log4j.core.util.ExecutorServices"
+  },
+  {
+    "name": "org.apache.logging.log4j.message.DefaultFlowMessageFactory",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.apache.logging.log4j.message.ReusableMessageFactory",
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  }
+]

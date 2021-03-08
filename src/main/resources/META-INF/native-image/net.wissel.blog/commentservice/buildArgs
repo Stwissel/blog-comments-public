@@ -1,0 +1,5 @@
+--allow-incomplete-classpath
+--no-fallback
+-H:+ReportExceptionStackTraces
+-H:+ReportUnsupportedElementsAtRuntime
+-H:+AllowIncompleteClasspath
