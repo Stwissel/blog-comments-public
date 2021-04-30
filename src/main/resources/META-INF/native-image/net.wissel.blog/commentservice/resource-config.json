@@ -1,0 +1,12 @@
+{
+  "resources": {
+    "includes": [
+      { "pattern": "\\QMETA-INF/vertx/vertx-version.txt\\E" },
+      { "pattern": "\\Qlog4j.properties\\E" },
+      { "pattern": "\\Qorg/slf4j/impl/StaticLoggerBinder.class\\E" },
+      { "pattern": "^.*\\.html$" },
+      { "pattern": "^.*\\.properties$" }
+    ]
+  },
+  "bundles": []
+}

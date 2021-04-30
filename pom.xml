@@ -1,32 +1,47 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.wissel.blog</groupId>
 	<artifactId>commentservice</artifactId>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<name>Comment acceptance Service</name>
 	<description>Vert.x based microservice to accept new blog comments and forward them to Bitbucket</description>
 	<properties>
-        <!-- Software versions -->
-        <java.version>1.8</java.version>
-        <vertx.version>3.6.3</vertx.version>
-        <commons.validator.version>1.6</commons.validator.version>
-        <captcha.version>1.0.2</captcha.version>
-    </properties>
+		<!-- Software versions -->
+		<java.version>11</java.version>
+
+		<captcha.version>1.0.4</captcha.version>
+		<commons.validator.version>1.7</commons.validator.version>
+		<graalvm.version>21.1.0</graalvm.version>
+		<jackson.version>2.12.3</jackson.version>
+		<maven.version>[3.6.3,)</maven.version>
+		<maven.compiler.release>11</maven.compiler.release>
+		<slf4j.version>1.7.28</slf4j.version>
+		<vertx.version>4.0.3</vertx.version>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<prerequisites>
+		<maven>${maven.version}</maven>
+	</prerequisites>
+
 	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.8.1</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<release>${java.version}</release>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.3</version>
+				<version>3.2.4</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -35,9 +50,9 @@
 						</goals>
 						<configuration>
 							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<manifestEntries>
+										<Main-Class>net.wissel.blog.CommentService</Main-Class>
 										<Main-Class>io.vertx.core.Starter</Main-Class>
 										<Main-Verticle>net.wissel.blog.CommentService</Main-Verticle>
 									</manifestEntries>
@@ -84,16 +99,35 @@
 			<version>${commons.validator.version}</version>
 		</dependency>
 
-		<!--  dependency>
-			<groupId>com.github.triologygmbh</groupId>
-			<artifactId>reCAPTCHA-V2-java</artifactId>
-			<version>${captcha.version}</version>
-		</dependency  -->
-		
 		<dependency>
-            <groupId>de.triology.recaptchav2-java</groupId>
-            <artifactId>recaptchav2-java</artifactId>
-            <version>${captcha.version}</version>
-        </dependency>
+			<groupId>de.triology.recaptchav2-java</groupId>
+			<artifactId>recaptchav2-java</artifactId>
+			<version>${captcha.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+
 	</dependencies>
 </project>

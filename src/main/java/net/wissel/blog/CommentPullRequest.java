@@ -1,10 +1,10 @@
 /** ========================================================================= *
- * Copyright (C)  2017, 2018 Stephan Wissel                                   *
+ * Copyright (C)  2017, 2021 Stephan Wissel                                   *
  *                            All rights reserved.                            *
  *                                                                            *
- *  @author     Stephan H. Wissel (stw) <stephan@wissel@net>                  *
+ *  @author     Stephan H. Wissel (stw) <stephan@wissel.net>                  *
  *                                       @notessensei                         *
- * @version     1.0                                                           *
+ * @version     1.1                                                           *
  * ========================================================================== *
  *                                                                            *
  * Licensed under the  Apache License, Version 2.0  (the "License").  You may *
@@ -24,13 +24,14 @@ package net.wissel.blog;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 
@@ -41,15 +42,20 @@ import io.vertx.ext.web.client.WebClientOptions;
  *
  */
 public class CommentPullRequest extends AbstractVerticle {
-    private final Logger            logger        = LoggerFactory.getLogger(this.getClass());
-    private WebClient               client        = null;
+
+    private static final String RETRY_COUNT = "retryCount";
+    private static final String EMAIL = "eMail";
+    private static final String BRANCH = "branch";
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private WebClient client = null;
     private final Queue<JsonObject> retryMessages = new LinkedList<>();
 
     /**
      * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Future)
      */
     @Override
-    public void start(final Future<Void> startFuture) throws Exception {
+    public void start(final Promise<Void> startFuture) {
 
         final EventBus eb = this.getVertx().eventBus();
         eb.consumer(Parameters.MESSAGE_PULLREQUEST, this::processNewMessages);
@@ -62,11 +68,11 @@ public class CommentPullRequest extends AbstractVerticle {
 
         // Compose pull request data
         final JsonObject source = new JsonObject();
-        source.put("branch", new JsonObject().put("name", message.getString("branch", "unknown")));
+        source.put(BRANCH, new JsonObject().put("name", message.getString(BRANCH, "unknown")));
         source.put("repository", new JsonObject().put("full_name", Config.INSTANCE.getRepositoryURL()));
 
         final JsonObject destination = new JsonObject();
-        destination.put("branch", new JsonObject().put("name", "master"));
+        destination.put(BRANCH, new JsonObject().put("name", "master"));
 
         // Final assembly
         final JsonObject body = new JsonObject();
@@ -78,8 +84,7 @@ public class CommentPullRequest extends AbstractVerticle {
         final WebClient wc = this.getWebClient();
         final String target = "/2.0/repositories/" + Config.INSTANCE.getRepositoryURL() + "/pullrequests/";
 
-        wc.post(443, "api.bitbucket.org", target).ssl(true)
-                .putHeader("Content-Type", "application/json")
+        wc.post(443, "api.bitbucket.org", target).ssl(true).putHeader("Content-Type", "application/json")
                 .putHeader("Authorization", "Bearer " + accessToken).sendJson(body, res -> {
                     if (res.failed()) {
                         this.logger.error(body.encode(), res.cause());
@@ -92,7 +97,7 @@ public class CommentPullRequest extends AbstractVerticle {
 
     private WebClient getWebClient() {
         if (this.client == null) {
-            final WebClientOptions options = new WebClientOptions().setUserAgent("CommentService 1.0").setSsl(true)
+            final WebClientOptions options = new WebClientOptions().setUserAgent("CommentService 1.1").setSsl(true)
                     .setKeepAlive(true);
             this.client = WebClient.create(this.vertx, options);
         }
@@ -102,17 +107,8 @@ public class CommentPullRequest extends AbstractVerticle {
     private void processNewMessages(final Message<JsonObject> incoming) {
         final JsonObject message = incoming.body();
 
-        final Future<String> userToken = Future.future();
-        userToken.setHandler(handler -> {
-            if (handler.succeeded()) {
-                final String accessToken = handler.result();
-                this.createPullRequest(message, accessToken);
-
-            } else {
-                this.logger.error(handler.cause().getMessage(), handler.cause());
-            }
-        });
-        OauthHelper.getAccessToken(userToken, this.getVertx());
+        OauthHelper.getAccessToken(this.getVertx()).onFailure(err -> this.logger.error(err.getMessage(), err))
+                .onSuccess(accessToken -> this.createPullRequest(message, accessToken));
     }
 
     private void retryHandler(final Long interval) {
@@ -120,18 +116,16 @@ public class CommentPullRequest extends AbstractVerticle {
         while (!this.retryMessages.isEmpty()) {
             final JsonObject candidate = this.retryMessages.poll();
             if (candidate != null) {
-                final int retryCount = (candidate.containsKey("retryCount")) ? (candidate.getInteger("retryCount") + 1)
-                        : 1;
-                candidate.put("retryCount", retryCount);
+                final int retryCount = candidate.getInteger(RETRY_COUNT, 0) + 1;
+                candidate.put(RETRY_COUNT, retryCount);
                 if (retryCount > 10) {
-                    this.logger.error(
-                            "Pull request Retry count exceeded from user:" + candidate.getString("eMail", "n/a"));
-                    this.getVertx().eventBus().publish(Parameters.MESSAGE_PUSH_COMMENT,
-                            candidate.put("Failure", "Pull request Retry count exceeded from user:"
-                                    + candidate.getString("eMail", "n/a")));
+                    this.logger.error("Pull request Retry count exceeded from user: {}",
+                            candidate.getString(EMAIL, "n/a"));
+                    this.getVertx().eventBus().publish(Parameters.MESSAGE_PUSH_COMMENT, candidate.put("Failure",
+                            "Pull request Retry count exceeded from user: " + candidate.getString(EMAIL, "n/a")));
                 } else {
                     // Put them back on the bus
-                    this.logger.info("Retry from user: " + candidate.getString("eMail", "n/a"));
+                    this.logger.info("Retry from user: {}", candidate.getString(EMAIL, "n/a"));
                     eb.publish(Parameters.MESSAGE_PULLREQUEST, candidate);
                 }
             }
