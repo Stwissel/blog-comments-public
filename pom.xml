@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.wissel.blog</groupId>
 	<artifactId>commentservice</artifactId>
-	<version>1.0.5</version>
+	<version>1.0.6</version>
 	<name>Comment acceptance Service</name>
 	<description>Vert.x based microservice to accept new blog comments and forward them to Bitbucket</description>
 	<properties>
@@ -13,18 +13,11 @@
 		<commons.validator.version>1.7</commons.validator.version>
 		<graalvm.version>21.1.0</graalvm.version>
 		<jackson.version>2.12.3</jackson.version>
-		<maven.version>[3.6.3,)</maven.version>
-		<maven.compiler.release>11</maven.compiler.release>
 		<slf4j.version>1.7.28</slf4j.version>
 		<vertx.version>4.0.3</vertx.version>
-
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
-
-	<prerequisites>
-		<maven>${maven.version}</maven>
-	</prerequisites>
 
 	<build>
 		<plugins>
