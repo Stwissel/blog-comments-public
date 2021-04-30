@@ -11,12 +11,12 @@
 
 		<captcha.version>1.0.4</captcha.version>
 		<commons.validator.version>1.7</commons.validator.version>
-		<graalvm.version>21.0.0.2</graalvm.version>
-		<jackson.version>2.12.2</jackson.version>
+		<graalvm.version>21.1.0</graalvm.version>
+		<jackson.version>2.12.3</jackson.version>
 		<maven.version>[3.6.3,)</maven.version>
 		<maven.compiler.release>11</maven.compiler.release>
 		<slf4j.version>1.7.28</slf4j.version>
-		<vertx.version>4.0.2</vertx.version>
+		<vertx.version>4.0.3</vertx.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
