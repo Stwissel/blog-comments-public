@@ -96,6 +96,7 @@
 							<summary>${project.description}</summary>
 							<vendor>${project.organization.name}</vendor>
 							<version>Comments ${project.version}</version>
+							<org.opencontainers.image.source>https://github.com/Stwissel/blog-comments-public</org.opencontainers.image.source>
 						</labels>
 					</container>
 				</configuration>
