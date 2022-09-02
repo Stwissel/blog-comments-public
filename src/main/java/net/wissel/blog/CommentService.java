@@ -97,6 +97,8 @@ public class CommentService extends AbstractVerticle {
 			incomingCommentRoute.failureHandler(this::commentFailure);
 
 			router.route("/*").handler(StaticHandler.create());
+			router.route(HttpMethod.GET, CommentService.commentPath)
+					.handler(ctx -> ctx.end("The spoken TAO is not the eternal TAO"));
 
 			server.requestHandler(router).listen(port).onFailure(err -> {
 				LOGGER.error("Could not start HTTP server on port {}", port);
