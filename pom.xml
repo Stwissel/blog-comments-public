@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.wissel.blog</groupId>
 	<artifactId>commentservice</artifactId>
-	<version>1.1.2</version>
+	<version>1.1.3</version>
 	<name>Comment acceptance Service</name>
 	<description>Vert.x based microservice to accept new blog comments and forward them to Bitbucket</description>
 
