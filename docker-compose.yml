@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+  comments:
+    image: ghcr.io/stwissel/blog-comments-public
+    ports:
+      - 8080:8080
+    environment:
+      ClientSecret: ${ClientSecret}
+      PORT: 8080
+      ClientToken: ${ClientToken}
+      PushToke: ${PushToken}
+      PushUser: ${PushUser}
+      OauthURL: bitbucket.org
+      RepositoryURL: stwissel/blogsource
+      CaptchaSecret: ${CaptchaSecret}

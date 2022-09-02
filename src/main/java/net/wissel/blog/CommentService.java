@@ -23,10 +23,8 @@ package net.wissel.blog;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
@@ -45,7 +43,6 @@ import io.vertx.ext.web.handler.StaticHandler;
 
 /**
  * @author swissel
- *
  */
 public class CommentService extends AbstractVerticle {
 
@@ -75,7 +72,9 @@ public class CommentService extends AbstractVerticle {
 		this.getVertx().deployVerticle("net.wissel.blog.CommentPush")
 				.compose(v -> this.getVertx().deployVerticle("net.wissel.blog.CommentPullRequest"))
 				.compose(v -> this.getVertx().deployVerticle("net.wissel.blog.CommentStore"))
-				.compose(v -> this.launchWebListener()).onFailure(startFuture::fail).onSuccess(startFuture::complete);
+				.compose(v -> this.launchWebListener())
+				.onFailure(startFuture::fail)
+				.onSuccess(startFuture::complete);
 	}
 
 	private Future<Void> launchWebListener() {
@@ -91,8 +90,9 @@ public class CommentService extends AbstractVerticle {
 				this.addCors(ctx);
 				ctx.response().end();
 			});
-			final Route incomingCommentRoute = router.route(HttpMethod.POST, CommentService.commentPath)
-					.consumes("application/json").produces("application/json");
+			final Route incomingCommentRoute =
+					router.route(HttpMethod.POST, CommentService.commentPath)
+							.consumes("application/json").produces("application/json");
 			incomingCommentRoute.handler(this::newComment);
 			incomingCommentRoute.failureHandler(this::commentFailure);
 
@@ -155,8 +155,9 @@ public class CommentService extends AbstractVerticle {
 		final HttpServerResponse response = ctx.response();
 		this.addCors(ctx);
 		final MultiMap headers = request.headers();
-		final JsonObject comment = ctx.getBodyAsJson();
-		comment.put("parameters", this.addParametersFromHeader(headers, request.remoteAddress().host()));
+		final JsonObject comment = ctx.body().asJsonObject();
+		comment.put("parameters",
+				this.addParametersFromHeader(headers, request.remoteAddress().host()));
 		try {
 			// Incoming comments are Markdown, legacy might be HTML, so we flag it here
 			comment.put("markdown", true);

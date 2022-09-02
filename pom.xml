@@ -2,28 +2,34 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.wissel.blog</groupId>
 	<artifactId>commentservice</artifactId>
-	<version>1.0.6</version>
+	<version>1.1.1</version>
 	<name>Comment acceptance Service</name>
 	<description>Vert.x based microservice to accept new blog comments and forward them to Bitbucket</description>
+
+	<organization>
+		<name>NotesSensei</name>
+		<url>https://wissel.net</url>
+	</organization>
+
 	<properties>
 		<!-- Software versions -->
-		<java.version>1.8</java.version>
-
+		<java.version>17</java.version>
 		<captcha.version>1.0.4</captcha.version>
 		<commons.validator.version>1.7</commons.validator.version>
 		<graalvm.version>21.1.0</graalvm.version>
-		<jackson.version>2.12.3</jackson.version>
-		<slf4j.version>1.7.28</slf4j.version>
-		<vertx.version>4.0.3</vertx.version>
+		<jackson.version>2.13.3</jackson.version>
+		<slf4j.version>2.0.0</slf4j.version>
+		<vertx.version>4.3.3</vertx.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.version>[3.8.1,)</maven.version>
 	</properties>
 
 	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<version>3.10.1</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
@@ -33,7 +39,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.2.4</version>
+				<version>3.3.0</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -50,6 +56,78 @@
 							</transformers>
 							<artifactSet />
 							<outputFile>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar</outputFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!-- Create Docker images using Google JIB -->
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.2.1</version>
+
+				<configuration>
+					<from>
+						<image>eclipse-temurin:17.0.4.1_1-jre-alpine</image>
+					</from>
+					<to>
+						<image>ghcr.io/stwissel/blog-comments-public</image>
+						<tags>
+							<tag>${project.version}</tag>
+							<tag>latest</tag>
+						</tags>
+					</to>
+					<container>
+						<creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+						<ports>
+							<port>8080</port>
+						</ports>
+						<environment>
+							<PORT>8080</PORT>
+							<OauthURL>bitbucket.org</OauthURL>
+							<RepositoryURL>stwissel/blogsource</RepositoryURL>
+						</environment>
+						<labels>
+							<buildtime>${maven.build.timestamp}</buildtime>
+							<description>HCL Domino with HCL Project KEEP</description>
+							<maintainer>stephan@wissel.net</maintainer>
+							<name>Public Blog comments</name>
+							<release>${maven.build.timestamp}</release>
+							<summary>${project.description}</summary>
+							<vendor>${project.organization.name}</vendor>
+							<version>Comments ${project.version}</version>
+						</labels>
+					</container>
+				</configuration>
+				<executions>
+					<execution>
+						<id>digit</id>
+						<phase>package</phase>
+						<goals>
+							<goal>build</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>${maven.version}</version>
+								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>${java.version}</version>
+								</requireJavaVersion>
+							</rules>
 						</configuration>
 					</execution>
 				</executions>
@@ -115,7 +193,7 @@
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<artifactId>slf4j-reload4j</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
 

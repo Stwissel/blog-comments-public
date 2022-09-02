@@ -1,10 +1,10 @@
 /** ========================================================================= *
- * Copyright (C)  2017, 2018 Stephan Wissel                                   *
+ * Copyright (C)  2017, 2022 Stephan Wissel                                   *
  *                            All rights reserved.                            *
  *                                                                            *
  *  @author     Stephan H. Wissel (stw) <stephan@wissel@net>                  *
  *                                       @notessensei                         *
- * @version     1.0                                                           *
+ * @version     1.1                                                           *
  * ========================================================================== *
  *                                                                            *
  * Licensed under the  Apache License, Version 2.0  (the "License").  You may *
@@ -21,13 +21,11 @@
  */
 package net.wissel.blog;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.vertx.core.json.JsonArray;
 
 @JsonIgnoreProperties
 public class BlogComment {
@@ -43,14 +41,15 @@ public class BlogComment {
 
 	/**
 	 * We want: a message, a name and an eMail
-	 * 
+	 *
 	 * @throws InvalidContentException
 	 */
 	public void checkForMandatoryFields(final String captchaKey) throws InvalidContentException {
 		boolean canProceed = true; // innocent until proven guilty
 
-		final StringBuilder result = new StringBuilder();
-		final Collection<String> problems = new ArrayList<String>();
+		final JsonArray problems = new JsonArray();
+		problems.add("Sorry submitting your comment didn't work, check this:");
+
 		if ((this.eMail == null) || !HTMLFilter.isEmail(this.eMail)) {
 			problems.add(String.valueOf(this.eMail) + " seems not to be a valid eMail");
 			canProceed = false;
@@ -66,7 +65,8 @@ public class BlogComment {
 			canProceed = false;
 		}
 
-		if ((this.webSite != null) && !this.webSite.trim().equals("") && !HTMLFilter.isURL(this.webSite)) {
+		if ((this.webSite != null) && !this.webSite.trim().equals("")
+				&& !HTMLFilter.isURL(this.webSite)) {
 			problems.add("Please provide a valid URL or none");
 			canProceed = false;
 		}
@@ -82,13 +82,7 @@ public class BlogComment {
 		}
 
 		if (!canProceed) {
-
-			result.append("Sorry submitting your comment didn't work, check this:\n");
-			for (final String p : problems) {
-				result.append(p);
-				result.append("\n");
-			}
-			throw new InvalidContentException(result.toString());
+			throw new InvalidContentException(problems.encodePrettily());
 		}
 	}
 }
