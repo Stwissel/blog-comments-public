@@ -53,7 +53,7 @@ public class Runner {
 					if (res.succeeded()) {
 						Runner.logger.info("{} deployed as {}", verticleID, res.result());
 					} else {
-						Runner.logger.error("Deployment failed for {}", verticleID);
+						Runner.logger.error("Deployment failed for {} {}", verticleID, res.cause());
 					}
 				});
 			} catch (final Exception e) {
