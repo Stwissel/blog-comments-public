@@ -5,6 +5,9 @@ services:
     ports:
       - 8080:8080
     restart: always
+    secrets:
+      - source: activityPub
+        target: "/opt/activityPub/users.json"
     environment:
       ClientSecret: ${ClientSecret}
       PORT: 8080
@@ -14,3 +17,6 @@ services:
       OauthURL: bitbucket.org
       RepositoryURL: stwissel/blogsource
       CaptchaSecret: ${CaptchaSecret}
+secrets:
+  activityPub:
+    file: ${ACTIVITY_USERS}

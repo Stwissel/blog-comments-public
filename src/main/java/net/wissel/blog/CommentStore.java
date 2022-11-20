@@ -27,10 +27,8 @@ import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Queue;
 import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
@@ -44,14 +42,13 @@ import io.vertx.ext.web.client.WebClientOptions;
  * Saves received comments into Bitbucket
  *
  * @author swissel
- *
  */
 public class CommentStore extends AbstractVerticle {
 
     private static final String RETRY_COUNT = "retryCount";
 
     WebClient client = null;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LogManager.getLogger(this.getClass());
 
     private final Queue<JsonObject> retryMessages = new LinkedList<>();
 
@@ -71,7 +68,8 @@ public class CommentStore extends AbstractVerticle {
     }
 
     private String getAuthorEmail(final JsonObject message) {
-        return "\"" + message.getString("Commentor") + "\"" + " <" + message.getString("eMail") + ">";
+        return "\"" + message.getString("Commentor") + "\"" + " <" + message.getString("eMail")
+                + ">";
     }
 
     private String getDateYear() {
@@ -86,13 +84,15 @@ public class CommentStore extends AbstractVerticle {
 
     private String getMessagePath(final JsonObject message) {
 
-        return "/src/comments/" + this.getDateYear() + message.getString(Parameters.ID_COMMENT) + ".json";
+        return "/src/comments/" + this.getDateYear() + message.getString(Parameters.ID_COMMENT)
+                + ".json";
     }
 
     private WebClient getWebClient() {
         if (this.client == null) {
-            final WebClientOptions options = new WebClientOptions().setUserAgent("CommentService 1.0.4").setSsl(true)
-                    .setKeepAlive(true);
+            final WebClientOptions options =
+                    new WebClientOptions().setUserAgent("CommentService 1.0.4").setSsl(true)
+                            .setKeepAlive(true);
             this.client = WebClient.create(this.vertx, options);
         }
         return this.client;
@@ -102,7 +102,8 @@ public class CommentStore extends AbstractVerticle {
 
         final JsonObject message = incoming.body();
         if (!message.containsKey(Parameters.CREATED)) {
-            final SimpleDateFormat sdf = new SimpleDateFormat(Parameters.IMPORT_DATE_FORMAT, Locale.US);
+            final SimpleDateFormat sdf =
+                    new SimpleDateFormat(Parameters.IMPORT_DATE_FORMAT, Locale.US);
             message.put(Parameters.CREATED, sdf.format(new Date()));
         }
 
@@ -114,7 +115,8 @@ public class CommentStore extends AbstractVerticle {
         this.logger.info("Processing {}", this.getMessagePath(message));
 
         OauthHelper.getAccessToken(this.getVertx()).onFailure(err -> {
-            this.logger.error("Failed to get access Token:" + this.getMessagePath(message), err);
+            this.logger.error("Failed to get access Token: {}, {}", this.getMessagePath(message),
+                    err);
             this.getVertx().eventBus().publish(Parameters.MESSAGE_PUSH_COMMENT,
                     message.put("Failure", "Failed to get access token"));
         }).onSuccess(accessToken -> this.storeMessageInBitbucket(message, accessToken));
@@ -162,10 +164,13 @@ public class CommentStore extends AbstractVerticle {
                 .putHeader("Content-Type", "application/x-www-form-urlencoded")
                 .putHeader("Authorization", "Bearer " + accessToken).sendForm(form, res -> {
                     if (res.failed()) {
-                        this.logger.error("Failed to send (will retry):" + this.getMessagePath(message), res.cause());
+                        this.logger.error(
+                                "Failed to send (will retry): {}, {}", this.getMessagePath(message),
+                                res.cause());
                         this.retryMessages.offer(message);
                     } else {
-                        this.getVertx().eventBus().publish(Parameters.MESSAGE_PUSH_COMMENT, message);
+                        this.getVertx().eventBus().publish(Parameters.MESSAGE_PUSH_COMMENT,
+                                message);
                         this.getVertx().eventBus().publish(Parameters.MESSAGE_PULLREQUEST, message);
                         this.logger.info("Posted to {}", this.getMessagePath(message));
                     }

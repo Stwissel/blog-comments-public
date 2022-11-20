@@ -22,20 +22,22 @@
 package net.wissel.blog;
 
 import java.util.function.Consumer;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author stw
- *
  */
 public class Runner {
 
-	static Logger logger = LoggerFactory.getLogger(Runner.class);
+	static Logger logger = LogManager.getLogger(Runner.class);
+
+	private Runner() {
+		// Only static methods here
+	}
 
 	/**
 	 * @param verticleID
@@ -49,19 +51,19 @@ public class Runner {
 				final DeploymentOptions depOpt = new DeploymentOptions();
 				vertx.deployVerticle(verticleID, depOpt, res -> {
 					if (res.succeeded()) {
-						Runner.logger.info(verticleID + " deployed as " + res.result());
+						Runner.logger.info("{} deployed as {}", verticleID, res.result());
 					} else {
-						Runner.logger.error("Deployment failed for " + verticleID);
+						Runner.logger.error("Deployment failed for {}", verticleID);
 					}
 				});
-			} catch (final Throwable t) {
-				Runner.logger.error(t.getMessage(),t);
+			} catch (final Exception e) {
+				Runner.logger.error(e.getMessage(), e);
 			}
 		};
 
 		final VertxOptions options = new VertxOptions();
 		if (Runner.isDebug(debugMode)) {
-			options.setBlockedThreadCheckInterval(1000 * 60 * 60);
+			options.setBlockedThreadCheckInterval(1000 * 60 * 60L);
 		}
 
 		final Vertx vertx = Vertx.vertx(options);

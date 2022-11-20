@@ -19,17 +19,15 @@ package net.wissel.blog;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import de.triology.recaptchav2java.ReCaptcha;
 
 /**
  * HTML filter utility. Java 8 mods by Stephan
- * 
+ *
  * @author Craig R. McClanahan
  * @author Tim Tye
  * @author Stephan Wissel
@@ -47,7 +45,7 @@ public final class HTMLFilter {
 	private static final Character LF = Character.valueOf('\n');
 	private static final Character QUOTE = Character.valueOf('"');
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(HTMLFilter.class);
+	private static final Logger LOGGER = LogManager.getLogger(HTMLFilter.class);
 
 	private static final Map<Character, String> FILTER_CHARS = new HashMap<>();
 
@@ -62,7 +60,7 @@ public final class HTMLFilter {
 	 * Filter the specified message string for characters that are sensitive in
 	 * HTML. This avoids potential attacks caused by including JavaScript codes in
 	 * the request URL that is often reported in error messages.
-	 * 
+	 *
 	 * @param message The message string to be filtered
 	 */
 	public static String filter(String message) {
@@ -93,7 +91,7 @@ public final class HTMLFilter {
 	/**
 	 * Gets a plain text equivalent of potentially HTML containing String Designed
 	 * for single line input fields, terminates on the first chr(10) or chr(13)
-	 * 
+	 *
 	 * @param message The message string to be stripped of HTML
 	 */
 	public static String strip(String message) {
@@ -133,7 +131,7 @@ public final class HTMLFilter {
 
 	/**
 	 * Checks that a string looks like a valid eMail address
-	 * 
+	 *
 	 * @param candidate The string to be checked
 	 */
 	public static boolean isEmail(String candidate) {
@@ -147,7 +145,7 @@ public final class HTMLFilter {
 
 	/**
 	 * Checks that a string looks like a valid URL
-	 * 
+	 *
 	 * @param candidate The string to be checked
 	 */
 	public static boolean isURL(String candidate) {
@@ -161,7 +159,7 @@ public final class HTMLFilter {
 
 	/**
 	 * Call to the reCaptcha
-	 * 
+	 *
 	 * @param remoteAddress
 	 * @param challenge
 	 * @param response

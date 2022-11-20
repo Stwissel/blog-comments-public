@@ -3,7 +3,7 @@
  * Copyright (C) 2017, 2018 Stephan Wissel *
  * All rights reserved. *
  * *
- * 
+ *
  * @author Stephan H. Wissel (stw) <stephan@wissel@net> *
  * @notessensei *
  * @version 1.0 *
@@ -32,9 +32,8 @@
  */
 package net.wissel.blog;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
@@ -50,7 +49,7 @@ import io.vertx.ext.web.client.WebClientOptions;
  */
 public class CommentPush extends AbstractVerticle {
 
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private final Logger logger = LogManager.getLogger(this.getClass());
   private WebClient client = null;
 
   /**
@@ -69,8 +68,9 @@ public class CommentPush extends AbstractVerticle {
 
   private WebClient getWebClient() {
     if (this.client == null) {
-      final WebClientOptions options = new WebClientOptions().setUserAgent("CommentService 1.0").setSsl(true)
-          .setKeepAlive(true);
+      final WebClientOptions options =
+          new WebClientOptions().setUserAgent("CommentService 1.0").setSsl(true)
+              .setKeepAlive(true);
       this.client = WebClient.create(this.vertx, options);
     }
     return this.client;

@@ -3,11 +3,11 @@
  * Copyright (C) 2017, 2018 Stephan Wissel *
  * All rights reserved. *
  * *
- * 
+ *
  * @author Stephan H. Wissel (stw) <stephan@wissel@net> *
  * @notessensei *
  * @version 1.0 *
- *          ==========================================================================
+ * ==========================================================================
  *          *
  *          *
  *          Licensed under the Apache License, Version 2.0 (the "License"). You
@@ -33,28 +33,29 @@
 package net.wissel.blog;
 
 import java.util.Base64;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 
 /**
  * @author stw
- *
  */
 public class OauthHelper {
 
-  public final static String AUTH_PATH = "/site/oauth2/authorize";
-  public final static String TOKEN_PATH = "/site/oauth2/access_token";
-  public final static String TOKEN_NAME = "access_token";
-  private final static Logger LOGGER = LoggerFactory.getLogger("OauthHelper");
+  public static final String AUTH_PATH = "/site/oauth2/authorize";
+  public static final String TOKEN_PATH = "/site/oauth2/access_token";
+  public static final String TOKEN_NAME = "access_token";
+  private static final Logger LOGGER = LogManager.getLogger("OauthHelper");
+
+
+  private OauthHelper() {
+    // Only static methods here
+  }
 
   /**
    * Creates a manual Session to retrieve an access token
@@ -65,8 +66,9 @@ public class OauthHelper {
    */
   public static Future<String> getAccessToken(final Vertx vertx) {
     return Future.future(result -> {
-      final WebClientOptions options = new WebClientOptions().setUserAgent("CommentService 1.0.4").setSsl(true)
-          .setKeepAlive(true);
+      final WebClientOptions options =
+          new WebClientOptions().setUserAgent("CommentService 1.0.4").setSsl(true)
+              .setKeepAlive(true);
       final WebClient wc = WebClient.create(vertx, options);
       final String accessBasic = Base64.getEncoder().encodeToString(
           (Config.INSTANCE.getClientToken() + ":" + Config.INSTANCE.getClientSecret()).getBytes());
@@ -89,9 +91,9 @@ public class OauthHelper {
                 } else {
                   result.fail("HTTP did not contain access token:" + authJson.encode());
                 }
-              } catch (final Throwable t) {
-                OauthHelper.LOGGER.error(t.getMessage(),t);
-                result.fail(t);
+              } catch (final Exception e) {
+                OauthHelper.LOGGER.error(e.getMessage(), e);
+                result.fail(e);
               }
             }
           });
