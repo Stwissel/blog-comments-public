@@ -24,8 +24,10 @@ package net.wissel.blog;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import io.vertx.core.AbstractVerticle;
@@ -84,59 +86,86 @@ public class CommentService extends AbstractVerticle {
 	}
 
 	private Future<Void> launchWebListener() {
-		return Future.future(promise -> {
-			final int port = Config.INSTANCE.getPort();
 
-			final HttpServer server = this.vertx.createHttpServer();
-			final Router router = Router.router(this.vertx);
+		Promise<Void> promise = Promise.promise();
+		final int port = Config.INSTANCE.getPort();
 
-			router.route().handler(BodyHandler.create());
-			final Route allowCORS = router.route(HttpMethod.OPTIONS, CommentService.commentPath);
-			allowCORS.handler(ctx -> {
-				this.addCors(ctx);
-				ctx.response().end();
-			});
-			final Route incomingCommentRoute =
-					router.route(HttpMethod.POST, CommentService.commentPath)
-							.consumes("application/json").produces("application/json");
-			incomingCommentRoute.handler(this::newComment);
-			incomingCommentRoute.failureHandler(this::commentFailure);
+		final HttpServer server = this.vertx.createHttpServer();
+		final Router router = Router.router(this.vertx);
 
-			this.addMastodonRoute(router);
-
-			router.route("/*").handler(StaticHandler.create());
-			router.route(HttpMethod.GET, CommentService.commentPath)
-					.handler(ctx -> ctx.end("The spoken TAO is not the eternal TAO"));
-
-			server.requestHandler(router).listen(port).onFailure(err -> {
-				LOGGER.error("Could not start HTTP server on port {}", port);
-				err.printStackTrace();
-				promise.fail(err);
-			}).onSuccess(v -> {
-				LOGGER.info("Server started on port {}", port);
-				promise.complete();
-			});
+		router.route().handler(BodyHandler.create());
+		final Route allowCORS = router.route(HttpMethod.OPTIONS, CommentService.commentPath);
+		allowCORS.handler(ctx -> {
+			this.addCors(ctx);
+			ctx.response().end();
 		});
+
+		final Route incomingCommentRoute =
+				router.route(HttpMethod.POST, CommentService.commentPath)
+						.consumes("application/json").produces("application/json");
+		incomingCommentRoute.handler(this::newComment);
+		incomingCommentRoute.failureHandler(this::commentFailure);
+
+		this.addMastodonRoute(router);
+
+		router.route("/*").handler(StaticHandler.create());
+		router.route(HttpMethod.GET, CommentService.commentPath)
+				.handler(ctx -> ctx.end("The spoken TAO is not the eternal TAO"));
+
+		server.requestHandler(router).listen(port).onFailure(err -> {
+			LOGGER.error("Could not start HTTP server on port {}", port);
+			err.printStackTrace();
+			promise.fail(err);
+		}).onSuccess(v -> {
+			LOGGER.info("Server started on port {}", port);
+			promise.complete();
+		});
+
+		return promise.future();
+
+	}
+
+	private Optional<Path> getUserFilePath(final String fileName) {
+		try {
+			final File sourceFile = new File(fileName);
+			if (sourceFile.exists() && sourceFile.isFile()) {
+				return Optional.ofNullable(sourceFile.toPath());
+			}
+		} catch (Exception e) {
+			LOGGER.error(e);
+		}
+		return Optional.empty();
 	}
 
 	private void addMastodonRoute(final Router router) {
 		final String routeURL = "/.well-known/webfinger";
-		final String sourceName = System.getenv("ACTIVITY_USERS");
-		final File sourceFile = new File(sourceName);
-		if (sourceFile.exists() && sourceFile.isFile()) {
+		final String dockerFileName = "/opt/activityPub/users.json";
+		final String localFileName = System.getenv("ACTIVITY_USERS");
+
+		Optional<Path> pathCandidate = getUserFilePath(dockerFileName);
+		if (!pathCandidate.isPresent()) {
+			pathCandidate = getUserFilePath(localFileName);
+		}
+
+		if (pathCandidate.isPresent()) {
 			try {
-				final String raw = Files.readString(sourceFile.toPath());
-				final JsonObject users = new JsonObject(raw);
-				users.stream()
-						.filter(entry -> entry.getValue() instanceof JsonObject)
-						.forEach(entry -> this.mastodonUsers.put(entry.getKey(),
-								entry.getValue()));
-				router.route(HttpMethod.GET, routeURL).handler(this::webfingerHandler);
+				final String raw = Files.readString(pathCandidate.get());
+				if (raw != null) {
+					final JsonObject users = new JsonObject(raw);
+					users.stream()
+							.filter(entry -> entry.getValue() instanceof JsonObject)
+							.forEach(entry -> this.mastodonUsers.put(entry.getKey(),
+									entry.getValue()));
+					router.route(HttpMethod.GET, routeURL).handler(this::webfingerHandler);
+				} else {
+					LOGGER.error("JSON file was empty");
+				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOGGER.error(e);
 			}
 		} else {
-			LOGGER.error("File {} not found, no webfinger URL loaded", sourceName);
+			LOGGER.error("File {} not found, no webfinger URL loaded",
+					pathCandidate.orElse(Path.of("unavailable")));
 		}
 	}
 
