@@ -157,6 +157,7 @@ public class CommentService extends AbstractVerticle {
 							.forEach(entry -> this.mastodonUsers.put(entry.getKey(),
 									entry.getValue()));
 					router.route(HttpMethod.GET, routeURL).handler(this::webfingerHandler);
+					LOGGER.info("Webfinger config loaded from {}", pathCandidate.get());
 				} else {
 					LOGGER.error("JSON file was empty");
 				}

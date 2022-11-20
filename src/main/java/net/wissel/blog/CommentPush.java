@@ -62,6 +62,7 @@ public class CommentPush extends AbstractVerticle {
       final EventBus eb = this.getVertx().eventBus();
       eb.consumer(Parameters.MESSAGE_PUSH_COMMENT, this::processNewMessages);
     }
+    logger.info("Verticle {} deployed", this.getClass().getName());
     startFuture.complete();
 
   }

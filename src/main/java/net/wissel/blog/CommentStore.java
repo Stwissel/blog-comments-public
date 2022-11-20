@@ -62,7 +62,7 @@ public class CommentStore extends AbstractVerticle {
         eb.consumer(Parameters.MESSAGE_NEW_COMMENT, this::processNewMessages);
         // For messages not going through retry after 10 seconds
         this.getVertx().setPeriodic(10000L, this::retryHandler);
-
+        logger.info("Verticle {} deployed", this.getClass().getName());
         startFuture.complete();
 
     }
