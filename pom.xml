@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.wissel.blog</groupId>
 	<artifactId>commentservice</artifactId>
@@ -19,7 +21,7 @@
 		<graalvm.version>21.1.0</graalvm.version>
 		<jackson.version>2.14.0</jackson.version>
 		<log4j.version>2.19.0</log4j.version>
-		<vertx.version>4.3.5</vertx.version>
+		<vertx.version>4.4.0</vertx.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.version>[3.8.1,)</maven.version>
@@ -73,7 +75,8 @@
 							<summary>${project.description}</summary>
 							<vendor>${project.organization.name}</vendor>
 							<version>Comments ${project.version}</version>
-							<org.opencontainers.image.source>https://github.com/Stwissel/blog-comments-public</org.opencontainers.image.source>
+							<org.opencontainers.image.source>
+								https://github.com/Stwissel/blog-comments-public</org.opencontainers.image.source>
 						</labels>
 					</container>
 				</configuration>

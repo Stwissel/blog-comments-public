@@ -23,7 +23,6 @@ import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import de.triology.recaptchav2java.ReCaptcha;
 
 /**
  * HTML filter utility. Java 8 mods by Stephan
@@ -168,10 +167,10 @@ public final class HTMLFilter {
 	public static boolean isValidCaptcha(String captchaKey, String response) {
 		boolean result = true;
 		// We only test if we have a remote address and the captcha switch is on
-		if (captchaKey != null) {
-			ReCaptcha reCaptcha = new ReCaptcha(captchaKey);
-			return reCaptcha.isValid(response);
-		}
+		// if (captchaKey != null) {
+		// ReCaptcha reCaptcha = new ReCaptcha(captchaKey);
+		// return reCaptcha.isValid(response);
+		// }
 
 		return result;
 	}
