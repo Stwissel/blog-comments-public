@@ -46,7 +46,6 @@ import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.handler.FileSystemAccess;
 import io.vertx.ext.web.handler.StaticHandler;
 
 /**
@@ -108,8 +107,6 @@ public class CommentService extends AbstractVerticle {
         incomingCommentRoute.failureHandler(this::commentFailure);
 
         this.addMastodonRoute(router);
-        router.route("/.well-known/*")
-                .handler(StaticHandler.create(FileSystemAccess.RELATIVE, "wellknown"));
 
         router.route("/*").handler(StaticHandler.create());
         router.route(HttpMethod.GET, CommentService.commentPath)
