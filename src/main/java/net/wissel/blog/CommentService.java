@@ -108,7 +108,7 @@ public class CommentService extends AbstractVerticle {
         incomingCommentRoute.failureHandler(this::commentFailure);
 
         this.addMastodonRoute(router);
-        router.route(".well-known/*")
+        router.route("/.well-known/*")
                 .handler(StaticHandler.create(FileSystemAccess.RELATIVE, "wellknown"));
 
         router.route("/*").handler(StaticHandler.create());
