@@ -46,6 +46,7 @@ import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.FileSystemAccess;
 import io.vertx.ext.web.handler.StaticHandler;
 
 /**
@@ -53,237 +54,245 @@ import io.vertx.ext.web.handler.StaticHandler;
  */
 public class CommentService extends AbstractVerticle {
 
-	private static String commentPath;
-	private static final Logger LOGGER = LogManager.getLogger(CommentService.class);
+    private static String commentPath;
+    private static final Logger LOGGER = LogManager.getLogger(CommentService.class);
 
-	/**
-	 * Convenience method to allow IDE Testing
-	 *
-	 * @param args - Not used here
-	 */
-	public static void main(final String[] args) {
-		CommentService.commentPath = args.length < 1 ? "/blogcomments/*" : args[0];
-		Runner.runVerticle(CommentService.class.getName(), true);
-	}
+    /**
+     * Convenience method to allow IDE Testing
+     *
+     * @param args - Not used here
+     */
+    public static void main(final String[] args) {
+        CommentService.commentPath = args.length < 1 ? "/blogcomments/*" : args[0];
+        Runner.runVerticle(CommentService.class.getName(), true);
+    }
 
-	private final List<String> corsValues = new ArrayList<>();
-	private final JsonObject mastodonUsers = new JsonObject();
+    private final List<String> corsValues = new ArrayList<>();
+    private final JsonObject mastodonUsers = new JsonObject();
 
-	/**
-	 * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Future)
-	 */
-	@Override
-	public void start(final Promise<Void> startFuture) {
-		// Use v4 only
-		System.setProperty("java.net.preferIPv4Stack", "true");
-		this.loadCors();
-		this.getVertx().deployVerticle("net.wissel.blog.CommentPush")
-				.compose(v -> this.getVertx().deployVerticle("net.wissel.blog.CommentPullRequest"))
-				.compose(v -> this.getVertx().deployVerticle("net.wissel.blog.CommentStore"))
-				.compose(v -> this.launchWebListener())
-				.onFailure(startFuture::fail)
-				.onSuccess(startFuture::complete);
-	}
+    /**
+     * @see io.vertx.core.AbstractVerticle#start(io.vertx.core.Future)
+     */
+    @Override
+    public void start(final Promise<Void> startFuture) {
+        // Use v4 only
+        System.setProperty("java.net.preferIPv4Stack", "true");
+        this.loadCors();
+        this.getVertx().deployVerticle("net.wissel.blog.CommentPush")
+                .compose(v -> this.getVertx().deployVerticle("net.wissel.blog.CommentPullRequest"))
+                .compose(v -> this.getVertx().deployVerticle("net.wissel.blog.CommentStore"))
+                .compose(v -> this.launchWebListener())
+                .onFailure(startFuture::fail)
+                .onSuccess(startFuture::complete);
+    }
 
-	private Future<Void> launchWebListener() {
+    private Future<Void> launchWebListener() {
 
-		Promise<Void> promise = Promise.promise();
-		final int port = Config.INSTANCE.getPort();
+        final Promise<Void> promise = Promise.promise();
+        final int port = Config.INSTANCE.getPort();
 
-		final HttpServer server = this.vertx.createHttpServer();
-		final Router router = Router.router(this.vertx);
+        final HttpServer server = this.vertx.createHttpServer();
+        final Router router = Router.router(this.vertx);
 
-		router.route().handler(BodyHandler.create());
-		final Route allowCORS = router.route(HttpMethod.OPTIONS, CommentService.commentPath);
-		allowCORS.handler(ctx -> {
-			this.addCors(ctx);
-			ctx.response().end();
-		});
+        router.route().handler(BodyHandler.create());
+        final Route allowCORS = router.route(HttpMethod.OPTIONS, CommentService.commentPath);
+        allowCORS.handler(ctx -> {
+            this.addCors(ctx);
+            ctx.response().end();
+        });
 
-		final Route incomingCommentRoute =
-				router.route(HttpMethod.POST, CommentService.commentPath)
-						.consumes("application/json").produces("application/json");
-		incomingCommentRoute.handler(this::newComment);
-		incomingCommentRoute.failureHandler(this::commentFailure);
+        final Route incomingCommentRoute =
+                router.route(HttpMethod.POST, CommentService.commentPath)
+                        .consumes("application/json").produces("application/json");
+        incomingCommentRoute.handler(this::newComment);
+        incomingCommentRoute.failureHandler(this::commentFailure);
 
-		this.addMastodonRoute(router);
+        this.addMastodonRoute(router);
+        router.route(".well-known/*")
+                .handler(StaticHandler.create(FileSystemAccess.RELATIVE, "wellknown"));
 
-		router.route("/*").handler(StaticHandler.create());
-		router.route(HttpMethod.GET, CommentService.commentPath)
-				.handler(ctx -> ctx.end("The spoken TAO is not the eternal TAO"));
+        router.route("/*").handler(StaticHandler.create());
+        router.route(HttpMethod.GET, CommentService.commentPath)
+                .handler(ctx -> ctx.end("The spoken TAO is not the eternal TAO"));
 
-		server.requestHandler(router).listen(port).onFailure(err -> {
-			LOGGER.error("Could not start HTTP server on port {}", port);
-			err.printStackTrace();
-			promise.fail(err);
-		}).onSuccess(v -> {
-			LOGGER.info("Server started on port {}", port);
-			promise.complete();
-		});
+        server.requestHandler(router).listen(port).onFailure(err -> {
+            LOGGER.error("Could not start HTTP server on port {}", port);
+            err.printStackTrace();
+            promise.fail(err);
+        }).onSuccess(v -> {
+            LOGGER.info("Server started on port {}", port);
+            promise.complete();
+        });
 
-		return promise.future();
+        return promise.future();
 
-	}
+    }
 
-	private Optional<Path> getUserFilePath(final String fileName) {
-		try {
-			final File sourceFile = new File(fileName);
-			if (sourceFile.exists() && sourceFile.isFile()) {
-				return Optional.ofNullable(sourceFile.toPath());
-			}
-		} catch (Exception e) {
-			LOGGER.error(e);
-		}
-		return Optional.empty();
-	}
+    private Optional<Path> getUserFilePath(final String fileName) {
+        try {
+            final File sourceFile = new File(fileName);
+            if (sourceFile.exists() && sourceFile.isFile()) {
+                return Optional.ofNullable(sourceFile.toPath());
+            }
+        } catch (final Exception e) {
+            LOGGER.error(e);
+        }
+        return Optional.empty();
+    }
 
-	private void addMastodonRoute(final Router router) {
-		final String routeURL = "/.well-known/webfinger";
-		final String dockerFileName = "/opt/activityPub/users.json";
-		final String localFileName = System.getenv("ACTIVITY_USERS");
+    private void addMastodonRoute(final Router router) {
+        final String routeURL = "/.well-known/webfinger";
+        final String dockerFileName = "/opt/activityPub/users.json";
+        final String localFileName = System.getenv("ACTIVITY_USERS");
 
-		Optional<Path> pathCandidate = getUserFilePath(dockerFileName);
-		if (!pathCandidate.isPresent()) {
-			pathCandidate = getUserFilePath(localFileName);
-		}
+        Optional<Path> pathCandidate = getUserFilePath(dockerFileName);
+        if (!pathCandidate.isPresent()) {
+            pathCandidate = getUserFilePath(localFileName);
+        }
 
-		if (pathCandidate.isPresent()) {
-			try {
-				final String raw = Files.readString(pathCandidate.get());
-				if (raw != null) {
-					final JsonObject users = new JsonObject(raw);
-					users.stream()
-							.filter(entry -> entry.getValue() instanceof JsonObject)
-							.forEach(entry -> this.mastodonUsers.put(entry.getKey(),
-									entry.getValue()));
-					router.route(HttpMethod.GET, routeURL).handler(this::webfingerHandler);
-					LOGGER.info("Webfinger config loaded from {}", pathCandidate.get());
-				} else {
-					LOGGER.error("JSON file was empty");
-				}
-			} catch (IOException e) {
-				LOGGER.error(e);
-			}
-		} else {
-			LOGGER.error("File {} not found, no webfinger URL loaded",
-					pathCandidate.orElse(Path.of("unavailable")));
-		}
-	}
+        if (pathCandidate.isPresent()) {
+            try {
+                final String raw = Files.readString(pathCandidate.get());
+                if (raw != null) {
+                    final JsonObject users = new JsonObject(raw);
+                    users.stream()
+                            .filter(entry -> entry.getValue() instanceof JsonObject)
+                            .forEach(entry -> this.mastodonUsers.put(entry.getKey(),
+                                    entry.getValue()));
+                    router.route(HttpMethod.GET, routeURL).handler(this::webfingerHandler);
+                    LOGGER.info("Webfinger config loaded from {}", pathCandidate.get());
+                } else {
+                    LOGGER.error("JSON file was empty");
+                }
+            } catch (final IOException e) {
+                LOGGER.error(e);
+            }
+        } else {
+            LOGGER.error("File {} not found, no webfinger URL loaded",
+                    pathCandidate.orElse(Path.of("unavailable")));
+        }
+    }
 
-	private void webfingerHandler(final RoutingContext ctx) {
-		final String resource = ctx.request().getParam("resource");
-		if (resource == null || !resource.startsWith("acct:")) {
-			ResultMessage.end(ctx.response(), "Invalid request", 400);
-			return;
-		}
-		final String user = resource.split(":")[1].toLowerCase();
-		if (!mastodonUsers.containsKey(user)) {
-			ResultMessage.end(ctx.response(), "No such user", 404);
-			return;
-		}
-		this.setReponseHeaders(ctx.response()).end(this.mastodonReply(user));
-	}
+    private void webfingerHandler(final RoutingContext ctx) {
+        final String resource = ctx.request().getParam("resource");
+        if (resource == null || !resource.startsWith("acct:")) {
+            ResultMessage.end(ctx.response(), "Invalid request", 400);
+            return;
+        }
+        // Potentially empty
+        final String[] split = resource.split(":");
+        if (split.length < 2) {
+            ResultMessage.end(ctx.response(), "Invalid request", 400);
+            return;
+        }
+        final String user = split[1].toLowerCase();
+        if (!mastodonUsers.containsKey(user)) {
+            ResultMessage.end(ctx.response(), "No such user", 404);
+            return;
+        }
+        this.setReponseHeaders(ctx.response()).end(this.mastodonReply(user));
+    }
 
-	private Buffer mastodonReply(final String user) {
-		final JsonObject j = this.mastodonUsers.getJsonObject(user);
-		final String userid = j.getString("userid", "johndoe");
-		final String domain = j.getString("domain", "unknown");
-		final JsonObject result = new JsonObject();
+    private Buffer mastodonReply(final String user) {
+        final JsonObject j = this.mastodonUsers.getJsonObject(user);
+        final String userid = j.getString("userid", "johndoe");
+        final String domain = j.getString("domain", "unknown");
+        final JsonObject result = new JsonObject();
 
-		result.put("subject", String.format("acct:%s@%s", userid, domain));
-		result.put("aliases", new JsonArray()
-				.add(String.format("https://:%s/@%s", domain, userid))
-				.add(String.format("https://:%s/users/%s", domain, userid)))
-				.put("links", new JsonArray()
-						.add(new JsonObject()
-								.put("rel", "http://webfinger.net/rel/profile-page")
-								.put("type", "text/html")
-								.put("href", String.format("https://%s/@%s", domain, userid)))
-						.add(new JsonObject()
-								.put("rel", "self")
-								.put("type", "application/activity+json")
-								.put("href", String.format("https://%s/users/%s", domain, userid)))
-						.add(new JsonObject()
-								.put("rel", "http://ostatus.org/schema/1.0/subscribe")
-								.put("template", String.format(
-										"https://%s/authorize_interaction?uri={uri}", domain))));
+        result.put("subject", String.format("acct:%s@%s", userid, domain));
+        result.put("aliases", new JsonArray()
+                .add(String.format("https://:%s/@%s", domain, userid))
+                .add(String.format("https://:%s/users/%s", domain, userid)))
+                .put("links", new JsonArray()
+                        .add(new JsonObject()
+                                .put("rel", "http://webfinger.net/rel/profile-page")
+                                .put("type", "text/html")
+                                .put("href", String.format("https://%s/@%s", domain, userid)))
+                        .add(new JsonObject()
+                                .put("rel", "self")
+                                .put("type", "application/activity+json")
+                                .put("href", String.format("https://%s/users/%s", domain, userid)))
+                        .add(new JsonObject()
+                                .put("rel", "http://ostatus.org/schema/1.0/subscribe")
+                                .put("template", String.format(
+                                        "https://%s/authorize_interaction?uri={uri}", domain))));
 
-		return result.toBuffer();
-	}
+        return result.toBuffer();
+    }
 
-	private HttpServerResponse setReponseHeaders(final HttpServerResponse response) {
-		response.setStatusCode(200)
-				.putHeader("content-type", "application/jrd+json; charset=utf-8")
-				.putHeader("x-frame-options", "DENY")
-				.putHeader("x-content-type-options", "nosniff")
-				.putHeader("content-security-policy",
-						"base-uri 'none'; default-src 'none'; frame-ancestors 'none';")
-				.putHeader("cache-control", "max-age=259200, public");
-		return response;
-	}
+    private HttpServerResponse setReponseHeaders(final HttpServerResponse response) {
+        response.setStatusCode(200)
+                .putHeader("content-type", "application/jrd+json; charset=utf-8")
+                .putHeader("x-frame-options", "DENY")
+                .putHeader("x-content-type-options", "nosniff")
+                .putHeader("content-security-policy",
+                        "base-uri 'none'; default-src 'none'; frame-ancestors 'none';")
+                .putHeader("cache-control", "max-age=259200, public");
+        return response;
+    }
 
-	private void addCors(final RoutingContext ctx) {
-		final HttpServerResponse response = ctx.response();
-		final String origin = ctx.request().getHeader("Origin");
-		if (origin != null && this.corsValues.contains(origin)) {
-			response.putHeader("Access-Control-Allow-Origin", origin);
-			response.putHeader("Access-Control-Allow-Methods", "OPTIONS, POST");
-			response.putHeader("Access-Control-Allow-Headers", "Content-Type");
-		}
-	}
+    private void addCors(final RoutingContext ctx) {
+        final HttpServerResponse response = ctx.response();
+        final String origin = ctx.request().getHeader("Origin");
+        if (origin != null && this.corsValues.contains(origin)) {
+            response.putHeader("Access-Control-Allow-Origin", origin);
+            response.putHeader("Access-Control-Allow-Methods", "OPTIONS, POST");
+            response.putHeader("Access-Control-Allow-Headers", "Content-Type");
+        }
+    }
 
-	private JsonObject addParametersFromHeader(final MultiMap headers, final String remoteHost) {
-		final JsonObject result = new JsonObject();
-		result.put(Parameters.HTTP_CLIENTIP, remoteHost);
-		// We overwrite duplicate values here -> never mind for our purpose!
-		headers.entries().forEach(entry -> result.put(entry.getKey(), entry.getValue()));
-		return result;
-	}
+    private JsonObject addParametersFromHeader(final MultiMap headers, final String remoteHost) {
+        final JsonObject result = new JsonObject();
+        result.put(Parameters.HTTP_CLIENTIP, remoteHost);
+        // We overwrite duplicate values here -> never mind for our purpose!
+        headers.entries().forEach(entry -> result.put(entry.getKey(), entry.getValue()));
+        return result;
+    }
 
-	/**
-	 * If we don't like the comment
-	 *
-	 * @param ctx Routing context
-	 */
-	private void commentFailure(final RoutingContext ctx) {
-		ResultMessage.end(ctx.response(), "Something went wrong", 500);
-	}
+    /**
+     * If we don't like the comment
+     *
+     * @param ctx Routing context
+     */
+    private void commentFailure(final RoutingContext ctx) {
+        ResultMessage.end(ctx.response(), "Something went wrong", 500);
+    }
 
-	private void loadCors() {
-		this.corsValues.add("http://localhost");
-		this.corsValues.add("https://wissel.net");
-		this.corsValues.add("https://www.wissel.net");
-		this.corsValues.add("https://stwissel.github.io");
-		this.corsValues.add("https://notessensei.com");
-		this.corsValues.add("https://www.notessensei.com");
-	}
+    private void loadCors() {
+        this.corsValues.add("http://localhost");
+        this.corsValues.add("https://wissel.net");
+        this.corsValues.add("https://www.wissel.net");
+        this.corsValues.add("https://stwissel.github.io");
+        this.corsValues.add("https://notessensei.com");
+        this.corsValues.add("https://www.notessensei.com");
+    }
 
-	/**
-	 * Captures incoming new comments to be routed to forwarder
-	 *
-	 * @param ctx Routing context
-	 */
-	private void newComment(final RoutingContext ctx) {
-		final HttpServerRequest request = ctx.request();
-		final HttpServerResponse response = ctx.response();
-		this.addCors(ctx);
-		final MultiMap headers = request.headers();
-		final JsonObject comment = ctx.body().asJsonObject();
-		comment.put("parameters",
-				this.addParametersFromHeader(headers, request.remoteAddress().host()));
-		try {
-			// Incoming comments are Markdown, legacy might be HTML, so we flag it here
-			comment.put("markdown", true);
-			// We check if we have everything
-			final BlogComment blogComment = comment.mapTo(BlogComment.class);
-			blogComment.checkForMandatoryFields(Config.INSTANCE.getCaptchSecret());
-			final EventBus eb = this.getVertx().eventBus();
-			eb.publish(Parameters.MESSAGE_NEW_COMMENT, comment);
-			ResultMessage.end(response, Parameters.SUCCESS_MESSAGE, 200);
-		} catch (final Exception e) {
-			e.printStackTrace();
-			ResultMessage.end(response, e.getMessage(), 400);
-		}
-	}
+    /**
+     * Captures incoming new comments to be routed to forwarder
+     *
+     * @param ctx Routing context
+     */
+    private void newComment(final RoutingContext ctx) {
+        final HttpServerRequest request = ctx.request();
+        final HttpServerResponse response = ctx.response();
+        this.addCors(ctx);
+        final MultiMap headers = request.headers();
+        final JsonObject comment = ctx.body().asJsonObject();
+        comment.put("parameters",
+                this.addParametersFromHeader(headers, request.remoteAddress().host()));
+        try {
+            // Incoming comments are Markdown, legacy might be HTML, so we flag it here
+            comment.put("markdown", true);
+            // We check if we have everything
+            final BlogComment blogComment = comment.mapTo(BlogComment.class);
+            blogComment.checkForMandatoryFields(Config.INSTANCE.getCaptchSecret());
+            final EventBus eb = this.getVertx().eventBus();
+            eb.publish(Parameters.MESSAGE_NEW_COMMENT, comment);
+            ResultMessage.end(response, Parameters.SUCCESS_MESSAGE, 200);
+        } catch (final Exception e) {
+            e.printStackTrace();
+            ResultMessage.end(response, e.getMessage(), 400);
+        }
+    }
 
 }
