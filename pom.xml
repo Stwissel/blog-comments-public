@@ -21,7 +21,7 @@
 		<graalvm.version>21.1.0</graalvm.version>
 		<jackson.version>2.15.2</jackson.version>
 		<log4j.version>2.19.0</log4j.version>
-		<vertx.version>4.4.4</vertx.version>
+		<vertx.version>4.5.22</vertx.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.version>[3.8.1,)</maven.version>
